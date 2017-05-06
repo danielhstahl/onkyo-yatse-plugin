@@ -17,6 +17,7 @@
 package tv.yatse.plugin.avreceiver.sample;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +32,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import tv.yatse.plugin.avreceiver.api.AVReceiverPluginService;
 import tv.yatse.plugin.avreceiver.api.YatseLogger;
+import tv.yatse.plugin.avreceiver.sample.helpers.Eiscp;
 import tv.yatse.plugin.avreceiver.sample.helpers.PreferencesHelper;
 
 /**
@@ -44,15 +46,18 @@ import tv.yatse.plugin.avreceiver.sample.helpers.PreferencesHelper;
 public class SettingsActivity extends AppCompatActivity {
 
     private static final String TAG = "SettingsActivity";
-
+    private Eiscp OnkyoClient;
     private String mMediaCenterUniqueId;
     private String mMediaCenterName;
     private boolean mMuted;
-
+    private String threadedIP;
+    private String threadedPort;
     @BindView(R.id.receiver_settings_title)
     TextView mViewSettingsTitle;
     @BindView(R.id.receiver_ip)
     EditText mViewReceiverIP;
+    @BindView(R.id.receiver_port)
+    EditText mViewReceiverPort;
     @BindView(R.id.btn_toggle_mute)
     ImageButton mViewMute;
 
@@ -72,25 +77,42 @@ public class SettingsActivity extends AppCompatActivity {
         }
         mViewSettingsTitle.setText(getString(R.string.sample_plugin_settings) + " " + mMediaCenterName);
         mViewReceiverIP.setText(PreferencesHelper.getInstance(getApplicationContext()).hostIp(mMediaCenterUniqueId));
+        String myPort=PreferencesHelper.getInstance(getApplicationContext()).hostPort(mMediaCenterUniqueId);
+        if(myPort.length()>5){
+
+            myPort=Integer.toString(R.string.sample_plugin_receiver_port_default);
+        }
+        mViewReceiverPort.setText(myPort);
     }
 
     @OnClick({R.id.btn_ok, R.id.btn_cancel, R.id.btn_vol_down, R.id.btn_toggle_mute, R.id.btn_vol_up})
     public void onClick(View v) {
         Intent resultIntent;
+        threadedIP=mViewReceiverIP.getText().toString();
+        threadedPort=mViewReceiverPort.getText().toString();
         switch (v.getId()) {
             case R.id.btn_toggle_mute:
+                if(mMuted){
+                    new testTask().execute("AMT00");//unmute
+                }
+                else{
+                    new testTask().execute("AMT01"); //mute
+                }
                 mViewMute.setImageResource(!mMuted ? R.drawable.ic_volume_low : R.drawable.ic_volume_off);
                 mMuted = !mMuted;
                 Snackbar.make(findViewById(R.id.receiver_settings_content), "Toggling mute", Snackbar.LENGTH_LONG).show();
                 break;
             case R.id.btn_vol_down:
+                new testTask().execute("MVLDOWN");
                 Snackbar.make(findViewById(R.id.receiver_settings_content), "Volume down", Snackbar.LENGTH_LONG).show();
                 break;
             case R.id.btn_vol_up:
+                new testTask().execute("MVLUP");
                 Snackbar.make(findViewById(R.id.receiver_settings_content), "Volume up", Snackbar.LENGTH_LONG).show();
                 break;
             case R.id.btn_ok:
-                PreferencesHelper.getInstance(getApplicationContext()).hostIp(mMediaCenterUniqueId, mViewReceiverIP.getText().toString());
+                PreferencesHelper.getInstance(getApplicationContext()).hostIp(mMediaCenterUniqueId, threadedIP);
+                PreferencesHelper.getInstance(getApplicationContext()).hostPort(mMediaCenterUniqueId, threadedPort);
                 resultIntent = new Intent();
                 resultIntent.putExtra(AVReceiverPluginService.EXTRA_STRING_MEDIA_CENTER_UNIQUE_ID, mMediaCenterUniqueId);
                 setResult(RESULT_OK, resultIntent);
@@ -104,6 +126,16 @@ public class SettingsActivity extends AppCompatActivity {
                 break;
             default:
                 break;
+        }
+    }
+    public class testTask extends AsyncTask<String,String,Eiscp> {
+        @Override
+        protected Eiscp doInBackground(String... message) {
+
+            OnkyoClient = new Eiscp();
+            OnkyoClient.connectSocket(threadedIP, Integer.parseInt(threadedPort));
+            OnkyoClient.sendCommand(message[0], true);
+            return null;
         }
     }
 

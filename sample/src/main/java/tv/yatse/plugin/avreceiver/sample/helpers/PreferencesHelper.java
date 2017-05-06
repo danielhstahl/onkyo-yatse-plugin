@@ -101,6 +101,9 @@ public class PreferencesHelper {
     public String hostIp(String hostUniqueId) {
         return mPreferences.getString("host_ip_" + hostUniqueId, "");
     }
+    public String hostPort(String hostUniqueId) {
+        return mPreferences.getString("host_port_" + hostUniqueId, "");
+    }
 
     public void hostIp(String hostUniqueId, String ip) {
         if (!TextUtils.equals(hostIp(hostUniqueId), ip)) {
@@ -108,6 +111,15 @@ public class PreferencesHelper {
         }
         SharedPreferences.Editor mEditor = mPreferences.edit();
         mEditor.putString("host_ip_" + hostUniqueId, ip);
+        mEditor.apply();
+    }
+
+    public void hostPort(String hostUniqueId, String port) {
+        if (!TextUtils.equals(hostPort(hostUniqueId), port)) {
+            settingsVersion(settingsVersion() + 1);
+        }
+        SharedPreferences.Editor mEditor = mPreferences.edit();
+        mEditor.putString("host_port_" + hostUniqueId, port);
         mEditor.apply();
     }
 

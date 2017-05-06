@@ -1,3 +1,12 @@
+# Onkyo/Integra receiver plugin
+
+Implementation of the Yatse Audio/Video receiver plugin API.  
+
+To install:  open the project in Android Studio.  Connect your phone to your computer.  Enable [USB debugging](https://developer.android.com/training/basics/firstapp/running-app.html).  You may have to [enable some other stuff](https://developer.android.com/studio/run/device.html) depending on your OS.
+
+Press "Run" and select your device.  It should work!
+
+
 # Yatse Audio/Video receiver plugin API
 
 API and Sample for Yatse Audio/Video receiver plugins
