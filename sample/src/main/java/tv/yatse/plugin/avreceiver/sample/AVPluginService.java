@@ -55,19 +55,6 @@ public class AVPluginService extends AVReceiverPluginService {
     @Override
     public void onCreate() {
         super.onCreate();
-        /*mHostUniqueId = EXTRA_STRING_MEDIA_CENTER_UNIQUE_ID;
-        if (TextUtils.isEmpty(mHostUniqueId)) {
-            YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error : No media center unique id sent");
-        }
-        mReceiverIP=PreferencesHelper.getInstance(getApplicationContext()).hostIp(mHostUniqueId);
-        mReceiverPort=PreferencesHelper.getInstance(getApplicationContext()).hostPort(mHostUniqueId);
-        if(TextUtils.isEmpty(mReceiverPort)){
-            YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error : No port");
-        }
-        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "This is the ip: %s", mReceiverIP);
-        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "This is the port: %s", mReceiverPort);
-        OnkyoClient.connectSocket(mReceiverIP, Integer.parseInt(mReceiverPort));*/
-        //new connectTask().execute();
     }
 
     @Override
@@ -112,7 +99,7 @@ public class AVPluginService extends AVReceiverPluginService {
     @Override
     protected boolean toggleMuteStatus() {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Toggling mute status");
-        displayToast("Toggling mute status");
+        //displayToast("Toggling mute status");
         mIsMuted = !mIsMuted;
         setMuteStatus(mIsMuted);
         return true;
@@ -121,7 +108,7 @@ public class AVPluginService extends AVReceiverPluginService {
     @Override
     protected boolean setVolumeLevel(double volume) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting volume level : %s", volume);
-        displayToast("Setting volume : " + volume);
+        //displayToast("Setting volume : " + volume);
 
         OnkyoClient.sendCommand("MVL"+String.format("0x%08X", (int) (volume))); //hexadecimal
         mVolumePercent = volume*100.0/max_volume;
@@ -139,7 +126,7 @@ public class AVPluginService extends AVReceiverPluginService {
         mVolumePercent = Math.min(max_volume, mVolumePercent + 100.0/max_volume);
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Calling volume plus");
 
-        displayToast("Volume plus");
+        //("Volume plus");
         return true;
     }
 
@@ -149,7 +136,7 @@ public class AVPluginService extends AVReceiverPluginService {
         mVolumePercent = Math.max(0.0, mVolumePercent - 100.0/max_volume);
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Calling volume minus");
 
-        displayToast("Volume minus");
+        //displayToast("Volume minus");
         return true;
     }
 
@@ -175,7 +162,7 @@ public class AVPluginService extends AVReceiverPluginService {
     @Override
     protected boolean executeCustomCommand(PluginCustomCommand customCommand) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Executing CustomCommand : %s", customCommand.title());
-        displayToast(customCommand.param1());
+        //displayToast(customCommand.param1());
         return false;
     }
 
@@ -190,14 +177,12 @@ public class AVPluginService extends AVReceiverPluginService {
 
     @Override
     protected void connectToHost(String uniqueId, String name, String ip) {
-        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "connectToHost called!  This is good!, %s, %s", uniqueId, name);
         mHostUniqueId = uniqueId;
         mHostName = name;
         mHostIp = ip;
 
         mReceiverIP = PreferencesHelper.getInstance(getApplicationContext()).hostIp(mHostUniqueId);
         mReceiverPort = PreferencesHelper.getInstance(getApplicationContext()).hostPort(mHostUniqueId);
-
 
         if (TextUtils.isEmpty(mReceiverIP)) {
             YatseLogger.getInstance(getApplicationContext()).logError(TAG, "No configuration for %s", name);
