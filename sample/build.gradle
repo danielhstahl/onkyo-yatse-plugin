@@ -21,7 +21,7 @@ android {
     buildToolsVersion "25.0.1"
 
     defaultConfig {
-        applicationId "tv.yatse.plugin.avreceiver.sample"
+        applicationId "tv.yatse.plugin.avreceiver.onkyo"
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 1
@@ -42,5 +42,4 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.4.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     compile project(':api')
-    compile files('libs/Onkyo.jar')
 }
