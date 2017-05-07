@@ -14,12 +14,11 @@
  *
  */
 
-package tv.yatse.plugin.avreceiver.sample;
+package tv.yatse.plugin.avreceiver.onkyo;
 
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
-import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,9 +27,9 @@ import java.util.Map;
 import tv.yatse.plugin.avreceiver.api.AVReceiverPluginService;
 import tv.yatse.plugin.avreceiver.api.PluginCustomCommand;
 import tv.yatse.plugin.avreceiver.api.YatseLogger;
-import tv.yatse.plugin.avreceiver.sample.helpers.EiscpConnector;
-import tv.yatse.plugin.avreceiver.sample.helpers.EiscpListener;
-import tv.yatse.plugin.avreceiver.sample.helpers.PreferencesHelper;
+import tv.yatse.plugin.avreceiver.onkyo.helpers.EiscpConnector;
+import tv.yatse.plugin.avreceiver.onkyo.helpers.EiscpListener;
+import tv.yatse.plugin.avreceiver.onkyo.helpers.PreferencesHelper;
 
 
 /**

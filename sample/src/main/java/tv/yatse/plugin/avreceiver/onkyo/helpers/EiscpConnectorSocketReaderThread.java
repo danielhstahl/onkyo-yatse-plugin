@@ -1,4 +1,4 @@
-package tv.yatse.plugin.avreceiver.sample.helpers;
+package tv.yatse.plugin.avreceiver.onkyo.helpers;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

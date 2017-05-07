@@ -14,7 +14,7 @@
  *
  */
 
-package tv.yatse.plugin.avreceiver.sample;
+package tv.yatse.plugin.avreceiver.onkyo;
 
 import android.os.Bundle;
 import android.view.View;

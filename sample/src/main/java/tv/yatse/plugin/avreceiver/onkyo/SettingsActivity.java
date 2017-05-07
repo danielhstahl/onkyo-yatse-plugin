@@ -14,7 +14,7 @@
  *
  */
 
-package tv.yatse.plugin.avreceiver.sample;
+package tv.yatse.plugin.avreceiver.onkyo;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -32,9 +32,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import tv.yatse.plugin.avreceiver.api.AVReceiverPluginService;
 import tv.yatse.plugin.avreceiver.api.YatseLogger;
-import tv.yatse.plugin.avreceiver.sample.helpers.EiscpConnector;
+import tv.yatse.plugin.avreceiver.onkyo.helpers.EiscpConnector;
 
-import tv.yatse.plugin.avreceiver.sample.helpers.PreferencesHelper;
+import tv.yatse.plugin.avreceiver.onkyo.helpers.PreferencesHelper;
 
 
 
