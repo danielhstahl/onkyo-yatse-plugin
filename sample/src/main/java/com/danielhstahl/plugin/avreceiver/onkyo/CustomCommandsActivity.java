@@ -14,21 +14,23 @@
  *
  */
 
-package tv.yatse.plugin.avreceiver.onkyo;
+package com.danielhstahl.plugin.avreceiver.onkyo;
 
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.TextView;
-
 import butterknife.BindView;
+import 	android.text.Html;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import tv.yatse.plugin.avreceiver.api.AVReceiverCustomCommandsAppCompatActivity;
 
 public class CustomCommandsActivity extends AVReceiverCustomCommandsAppCompatActivity {
-
     @BindView(R.id.custom_command_title)
     TextView mViewTitle;
+    @BindView(R.id.url_to_commands)
+    TextView mViewUrl;
     @BindView(R.id.custom_command_param1)
     TextView mViewParam1;
 
@@ -37,10 +39,19 @@ public class CustomCommandsActivity extends AVReceiverCustomCommandsAppCompatAct
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_commands);
 
+        //TextView textView =(TextView)findViewById(R.id.url_to_commands);
+        /**/
         ButterKnife.bind(this);
         if (isEditing()) {
             mViewTitle.setText(pluginCustomCommand.title());
             mViewParam1.setText(pluginCustomCommand.param1());
+            mViewUrl.setClickable(true);
+            mViewUrl.setMovementMethod(LinkMovementMethod.getInstance());
+            //String text = "<a href='http://michael.elsdoerfer.name/onkyo/'>Get codes here.</a>";
+            //mViewUrl.setText(Html.fromHtml(text));
+
+
+            //mViewUrl.setMovementMethod(LinkMovementMethod.getInstance());
         }
     }
 

@@ -14,7 +14,7 @@
  *
  */
 
-package tv.yatse.plugin.avreceiver.onkyo;
+package com.danielhstahl.plugin.avreceiver.onkyo;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -32,9 +32,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import tv.yatse.plugin.avreceiver.api.AVReceiverPluginService;
 import tv.yatse.plugin.avreceiver.api.YatseLogger;
-import tv.yatse.plugin.avreceiver.onkyo.helpers.EiscpConnector;
+import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpConnector;
 
-import tv.yatse.plugin.avreceiver.onkyo.helpers.PreferencesHelper;
+import com.danielhstahl.plugin.avreceiver.onkyo.helpers.PreferencesHelper;
 
 
 
@@ -59,6 +59,8 @@ public class SettingsActivity extends AppCompatActivity  {
     private String threadedPort;
     @BindView(R.id.receiver_settings_title)
     TextView mViewSettingsTitle;
+    @BindView(R.id.receiver_port_description)
+    TextView mPortDescription;
     @BindView(R.id.receiver_ip)
     EditText mViewReceiverIP;
     @BindView(R.id.receiver_port)
@@ -81,10 +83,10 @@ public class SettingsActivity extends AppCompatActivity  {
             Snackbar.make(findViewById(R.id.receiver_settings_content), "Wrong data sent by Yatse !", Snackbar.LENGTH_LONG).show();
         }
         mViewSettingsTitle.setText(getString(R.string.sample_plugin_settings) + " " + mMediaCenterName);
+        mPortDescription.setText(getString(R.string.sample_plugin_receiver_port_description)+" ("+EiscpConnector.DEFAULT_EISCP_PORT+")");
         mViewReceiverIP.setText(PreferencesHelper.getInstance(getApplicationContext()).hostIp(mMediaCenterUniqueId));
         String myPort=PreferencesHelper.getInstance(getApplicationContext()).hostPort(mMediaCenterUniqueId);
-        if(myPort.length()>5){
-
+        if(myPort.length()>5|myPort.length()==0){
             myPort=Integer.toString(EiscpConnector.DEFAULT_EISCP_PORT);
         }
         mViewReceiverPort.setText(myPort);

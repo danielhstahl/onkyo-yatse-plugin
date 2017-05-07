@@ -21,11 +21,11 @@
     <string name="sample_plugin_settings">Settings for:</string>
     <string name="sample_plugin_error">Error:</string>
     <string name="sample_plugin_receiver_scan">Receiver Scan</string>
-    <string name="sample_plugin_receiver_scan_description">Attempt to scan: if it works, IP and Port will be filled in automatically</string>
+    <string name="sample_plugin_receiver_scan_description">Attempt to scan: if it works, IP and Port will be filled in automatically.</string>
     <string name="sample_plugin_receiver_ip">Receiver IP</string>
     <string name="sample_plugin_receiver_ip_description">Enter the Receiver\'s IP address.</string>
     <string name="sample_plugin_receiver_port">Receiver Port</string>
-    <string name="sample_plugin_receiver_port_description">Enter the Receiver\'s Port (60128)</string>
+    <string name="sample_plugin_receiver_port_description">Enter the Receiver\'s Port</string>
     <string name="sample_plugin_tests">Tests</string>
     <string name="sample_plugin_tests_description">You can test your settings by pressing the buttons below.</string>
 
@@ -33,7 +33,8 @@
     <string name="plugin_unique_id" translatable="false" tools:ignore="TypographyDashes">eb3e7148-15c1-4ba4-ba60-58b5938b293d</string>
 
     <string name="sample_plugin_custom_command">Custom Command</string>
-    <string name="sample_plugin_custom_command_description">Add specific command that your Onkyo receiver support.</string>
+    <string name="sample_plugin_custom_command_description">Add specific commands that your Onkyo receiver supports.  </string>
+    <string name="url_to_commands"><a href='http://michael.elsdoerfer.name/onkyo/'>Get codes here.</a></string>
     <string name="sample_plugin_custom_command_title">Name</string>
     <string name="sample_plugin_custom_command_param1">Parameter 1</string>
 

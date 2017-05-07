@@ -14,7 +14,7 @@
  *
  */
 
-package tv.yatse.plugin.avreceiver.onkyo;
+package com.danielhstahl.plugin.avreceiver.onkyo;
 
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -27,9 +27,9 @@ import java.util.Map;
 import tv.yatse.plugin.avreceiver.api.AVReceiverPluginService;
 import tv.yatse.plugin.avreceiver.api.PluginCustomCommand;
 import tv.yatse.plugin.avreceiver.api.YatseLogger;
-import tv.yatse.plugin.avreceiver.onkyo.helpers.EiscpConnector;
-import tv.yatse.plugin.avreceiver.onkyo.helpers.EiscpListener;
-import tv.yatse.plugin.avreceiver.onkyo.helpers.PreferencesHelper;
+import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpConnector;
+import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpListener;
+import com.danielhstahl.plugin.avreceiver.onkyo.helpers.PreferencesHelper;
 
 
 /**
@@ -87,7 +87,6 @@ public class AVPluginService extends AVReceiverPluginService  {
         else
             sendIscpCommand(EiscpConnector.MUTE_OFF); //mute
         mIsMuted = !isMuted;
-        //displayToast("Setting mute status : " + status);
         return true;
     }
 
@@ -135,8 +134,12 @@ public class AVPluginService extends AVReceiverPluginService  {
     @Override
     protected boolean refresh() {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Refreshing values from receiver");
-        mVolumePercent=(double)(Integer.parseInt(lastReceivedValues.get(EiscpConnector.MASTER_VOL).trim(), 16 ))*numberOfPercentsInOne/max_volume;
-        mIsMuted=lastReceivedValues.get(EiscpConnector.MUTE).equals("01");
+        if(lastReceivedValues.get(EiscpConnector.MASTER_VOL)!=null){
+            mVolumePercent=(double)(Integer.parseInt(lastReceivedValues.get(EiscpConnector.MASTER_VOL), 16 ))*numberOfPercentsInOne/max_volume;
+        }
+        if(lastReceivedValues.get(EiscpConnector.MUTE)!=null) {
+            mIsMuted = lastReceivedValues.get(EiscpConnector.MUTE).equals("01");
+        }
         return true;
     }
 
@@ -145,15 +148,14 @@ public class AVPluginService extends AVReceiverPluginService  {
         String source = getString(R.string.plugin_unique_id);
         List<PluginCustomCommand> commands = new ArrayList<>();
         // Plugin custom commands must set the source parameter to their plugin unique Id !
-        commands.add(new PluginCustomCommand().title("Sample command 1").source(source).param1("Sample command 1").type(0));
-        commands.add(new PluginCustomCommand().title("Sample command 2").source(source).param1("Sample command 2").type(1).readOnly(true));
+        commands.add(new PluginCustomCommand().title("Sample command: Volume Up").source(source).param1(EiscpConnector.MASTER_VOL_UP).type(0));
         return commands;
     }
 
     @Override
     protected boolean executeCustomCommand(PluginCustomCommand customCommand) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Executing CustomCommand : %s", customCommand.title());
-        //displayToast(customCommand.param1());
+        sendIscpCommand(customCommand.param1());
         return false;
     }
 

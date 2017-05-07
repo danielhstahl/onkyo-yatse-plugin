@@ -14,7 +14,7 @@
  *
  */
 
-package tv.yatse.plugin.avreceiver.onkyo.helpers;
+package com.danielhstahl.plugin.avreceiver.onkyo.helpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;

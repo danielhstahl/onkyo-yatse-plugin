@@ -1,4 +1,4 @@
-package tv.yatse.plugin.avreceiver.onkyo.helpers;
+package com.danielhstahl.plugin.avreceiver.onkyo.helpers;
 
 
 import java.io.BufferedInputStream;

@@ -18,7 +18,7 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context=".Setup">
+                tools:context=".SettingsActivity">
 
     <ScrollView
         android:id="@+id/receiver_settings_content"

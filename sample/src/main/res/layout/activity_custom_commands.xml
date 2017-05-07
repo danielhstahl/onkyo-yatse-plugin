@@ -19,7 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="tv.yatse.plugin.avreceiver.sample.CustomCommandsActivity">
+    tools:context=".CustomCommandsActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -46,12 +46,20 @@
                 android:textSize="16sp"/>
 
             <TextView
+                android:id="@+id/custom_command_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:text="@string/sample_plugin_custom_command_description"
                 android:textColor="@color/white"/>
-
+            <TextView
+                android:id="@+id/url_to_commands"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="@string/url_to_commands"
+                android:textColor="@color/white"
+                />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
