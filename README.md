@@ -2,9 +2,13 @@
 
 Implementation of the Yatse Audio/Video receiver plugin API.  
 
-To install:  open the project in Android Studio.  Connect your phone to your computer.  Enable [USB debugging](https://developer.android.com/training/basics/firstapp/running-app.html).  You may have to [enable some other stuff](https://developer.android.com/studio/run/device.html) depending on your OS.
+Download the [apk](./sample/sample-release.apk) on your Android device and it should show as an option in Yatse's "Editing Host"->"Advanced"->"Plugins" (see [Yatse's guide for details](https://yatse.tv/redmine/projects/yatse/wiki/Setup)).  
+
+To dev/test:  open the project in Android Studio.  Connect your phone to your computer.  Enable [USB debugging](https://developer.android.com/training/basics/firstapp/running-app.html).  You may have to [enable some other stuff](https://developer.android.com/studio/run/device.html) depending on your OS.
 
 Press "Run" and select your device.  It should work!
+
+
 
 The Onkyo protocol borrows heavily from [clijk's jEISCP](https://github.com/cljk/jEISCP).
 

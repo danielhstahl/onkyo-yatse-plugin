@@ -30,3 +30,5 @@ Thumbs.db
 
 # Idea non-crucial project fileS
 *.iws
+
+sample/build
