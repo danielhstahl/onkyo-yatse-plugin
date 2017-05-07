@@ -6,6 +6,7 @@ To install:  open the project in Android Studio.  Connect your phone to your com
 
 Press "Run" and select your device.  It should work!
 
+The Onkyo protocol borrows heavily from [clijk's jEISCP](https://github.com/cljk/jEISCP).
 
 # Yatse Audio/Video receiver plugin API
 

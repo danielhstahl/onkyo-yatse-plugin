@@ -32,8 +32,13 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import tv.yatse.plugin.avreceiver.api.AVReceiverPluginService;
 import tv.yatse.plugin.avreceiver.api.YatseLogger;
-import tv.yatse.plugin.avreceiver.sample.helpers.Eiscp;
+import tv.yatse.plugin.avreceiver.sample.helpers.EiscpConnector;
+
 import tv.yatse.plugin.avreceiver.sample.helpers.PreferencesHelper;
+
+
+
+
 
 /**
  * Sample SettingsActivity that handle correctly the parameters passed by Yatse.
@@ -43,10 +48,10 @@ import tv.yatse.plugin.avreceiver.sample.helpers.PreferencesHelper;
  * <p/>
  * <b>Production plugin should make input validation and tests before accepting the user input and returning RESULT_OK.</b>
  */
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity  {
 
     private static final String TAG = "SettingsActivity";
-    private Eiscp OnkyoClient;
+    private EiscpConnector conn;
     private String mMediaCenterUniqueId;
     private String mMediaCenterName;
     private boolean mMuted;
@@ -80,34 +85,37 @@ public class SettingsActivity extends AppCompatActivity {
         String myPort=PreferencesHelper.getInstance(getApplicationContext()).hostPort(mMediaCenterUniqueId);
         if(myPort.length()>5){
 
-            myPort=Integer.toString(R.string.sample_plugin_receiver_port_default);
+            myPort=Integer.toString(EiscpConnector.DEFAULT_EISCP_PORT);
         }
         mViewReceiverPort.setText(myPort);
     }
 
-    @OnClick({R.id.btn_ok, R.id.btn_cancel, R.id.btn_vol_down, R.id.btn_toggle_mute, R.id.btn_vol_up})
+    @OnClick({R.id.receiver_scan, R.id.btn_ok, R.id.btn_cancel, R.id.btn_vol_down, R.id.btn_toggle_mute, R.id.btn_vol_up})
     public void onClick(View v) {
         Intent resultIntent;
         threadedIP=mViewReceiverIP.getText().toString();
         threadedPort=mViewReceiverPort.getText().toString();
         switch (v.getId()) {
+            case R.id.receiver_scan:
+                new seekAddress().execute();
+                break;
             case R.id.btn_toggle_mute:
                 if(mMuted){
-                    new testTask().execute("AMT00");//unmute
+                    new testTask().execute(EiscpConnector.MUTE_OFF);
                 }
-                else{
-                    new testTask().execute("AMT01"); //mute
+                else {
+                    new testTask().execute(EiscpConnector.MUTE_ON);
                 }
                 mViewMute.setImageResource(!mMuted ? R.drawable.ic_volume_low : R.drawable.ic_volume_off);
                 mMuted = !mMuted;
                 Snackbar.make(findViewById(R.id.receiver_settings_content), "Toggling mute", Snackbar.LENGTH_LONG).show();
                 break;
             case R.id.btn_vol_down:
-                new testTask().execute("MVLDOWN");
+                new testTask().execute(EiscpConnector.MASTER_VOL_DOWN);
                 Snackbar.make(findViewById(R.id.receiver_settings_content), "Volume down", Snackbar.LENGTH_LONG).show();
                 break;
             case R.id.btn_vol_up:
-                new testTask().execute("MVLUP");
+                new testTask().execute(EiscpConnector.MASTER_VOL_UP);
                 Snackbar.make(findViewById(R.id.receiver_settings_content), "Volume up", Snackbar.LENGTH_LONG).show();
                 break;
             case R.id.btn_ok:
@@ -128,15 +136,40 @@ public class SettingsActivity extends AppCompatActivity {
                 break;
         }
     }
-    public class testTask extends AsyncTask<String,String,Eiscp> {
+    public class testTask extends AsyncTask<String, String, EiscpConnector> {
         @Override
-        protected Eiscp doInBackground(String... message) {
-
-            OnkyoClient = new Eiscp();
-            OnkyoClient.connectSocket(threadedIP, Integer.parseInt(threadedPort));
-            OnkyoClient.sendCommand(message[0], true);
+        protected EiscpConnector doInBackground(String... message){
+            try {
+                conn = new EiscpConnector(threadedIP, Integer.parseInt(threadedPort));
+                conn.sendIscpCommand(message[0]);
+                conn.close();
+            }catch(Exception e){
+                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e);
+            }
             return null;
         }
+
+    }
+    public class seekAddress extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... message){
+            String address=null;
+            try {
+                conn = EiscpConnector.autodiscover();
+                address=conn.getAddress();
+
+                conn.close();
+            }catch(Exception e){
+                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when scanning: %s", e);
+            }
+            return address;
+        }
+        @Override
+        protected void onPostExecute(String address){
+            mViewReceiverIP.setText(address);
+            mViewReceiverPort.setText(Integer.toString(EiscpConnector.DEFAULT_EISCP_PORT));
+        }
+
     }
 
 }

@@ -44,7 +44,18 @@
                 android:textAllCaps="true"
                 android:textColor="@color/accent"
                 android:textSize="16sp"/>
-
+            <TextView
+                android:id="@+id/receiver_scan_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="@string/sample_plugin_receiver_scan_description"
+                android:textColor="@color/white"/>
+            <Button
+                android:id="@+id/receiver_scan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/sample_plugin_receiver_scan"/>
             <TextView
                 android:id="@+id/receiver_ip_description"
                 android:layout_width="wrap_content"

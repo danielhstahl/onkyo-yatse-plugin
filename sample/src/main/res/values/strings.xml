@@ -20,10 +20,11 @@
     <string name="sample_plugin_description">Onkyo plugin</string>
     <string name="sample_plugin_settings">Settings for:</string>
     <string name="sample_plugin_error">Error:</string>
+    <string name="sample_plugin_receiver_scan">Receiver Scan</string>
+    <string name="sample_plugin_receiver_scan_description">Attempt to scan: if it works, IP and Port will be filled in automatically</string>
     <string name="sample_plugin_receiver_ip">Receiver IP</string>
     <string name="sample_plugin_receiver_ip_description">Enter the Receiver\'s IP address.</string>
     <string name="sample_plugin_receiver_port">Receiver Port</string>
-    <string name="sample_plugin_receiver_port_default">60128</string>
     <string name="sample_plugin_receiver_port_description">Enter the Receiver\'s Port (60128)</string>
     <string name="sample_plugin_tests">Tests</string>
     <string name="sample_plugin_tests_description">You can test your settings by pressing the buttons below.</string>
