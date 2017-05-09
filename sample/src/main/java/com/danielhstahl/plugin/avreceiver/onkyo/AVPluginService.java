@@ -23,12 +23,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 
 import tv.yatse.plugin.avreceiver.api.AVReceiverPluginService;
 import tv.yatse.plugin.avreceiver.api.PluginCustomCommand;
 import tv.yatse.plugin.avreceiver.api.YatseLogger;
 import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpConnector;
-import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpListener;
+import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpController;
 import com.danielhstahl.plugin.avreceiver.onkyo.helpers.PreferencesHelper;
 
 
@@ -82,10 +83,9 @@ public class AVPluginService extends AVReceiverPluginService  {
     protected boolean setMuteStatus(boolean isMuted) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting mute status : %s", isMuted);
         if (isMuted)
-            sendIscpCommand(EiscpConnector.MUTE_OFF); //unmute
-
+            new sendIscpCommandAsync().execute(EiscpConnector.MUTE_OFF); //unmute
         else
-            sendIscpCommand(EiscpConnector.MUTE_ON); //mute
+            new sendIscpCommandAsync().execute(EiscpConnector.MUTE_ON); //mute
         mIsMuted = !isMuted;
         return true;
     }
@@ -165,9 +165,9 @@ public class AVPluginService extends AVReceiverPluginService  {
         mHostName = name;
         mHostIp = ip;
 
-        mReceiverIP = PreferencesHelper.getInstance(getApplicationContext()).hostIp(mHostUniqueId);
+       /* mReceiverIP = PreferencesHelper.getInstance(getApplicationContext()).hostIp(mHostUniqueId);
         mReceiverPort = PreferencesHelper.getInstance(getApplicationContext()).hostPort(mHostUniqueId);
-        new connectToReceiver().execute();
+        new connectToReceiver().execute();*/
 
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Connected to : %s / %s ", name, mHostUniqueId);
     }
@@ -192,13 +192,29 @@ public class AVPluginService extends AVReceiverPluginService  {
     }
 
     public void sendIscpCommand(String cmd) {
+        //mReceiverIP = PreferencesHelper.getInstance(getApplicationContext()).hostIp(mHostUniqueId);
+        //mReceiverPort = PreferencesHelper.getInstance(getApplicationContext()).hostPort(mHostUniqueId);
         try {
             conn.sendIscpCommand(cmd);
 
         } catch (Exception ex) {
-            connectToHost(mHostUniqueId, mHostName, mHostIp);//attempt to connect if errrored
+            //connectToHost(mHostUniqueId, mHostName, mHostIp);//attempt to connect if errored
             YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when sending command: %s", ex.getMessage());
         }
+    }
+    public class sendIscpCommandAsync extends AsyncTask<String, String, EiscpConnector> {
+        @Override
+        protected EiscpConnector doInBackground(String... message){
+            try {
+                conn = new EiscpConnector(mHostIp, Integer.parseInt(mReceiverPort));
+                conn.sendIscpCommand(message[0]);
+                conn.close();
+            }catch(Exception e){
+                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e);
+            }
+            return null;
+        }
+
     }
     public class connectToReceiver extends AsyncTask<String, String, EiscpConnector> {
         @Override
@@ -206,6 +222,8 @@ public class AVPluginService extends AVReceiverPluginService  {
             EiscpConnector conn=null;
             try {
                 conn = new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
+                conn.sendIscpCommand(EiscpConnector.MUTE_QUERY);
+                conn.sendIscpCommand(EiscpConnector.MASTER_VOL_QUERY);
             }catch(Exception e){
                 YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e);
             }
@@ -214,13 +232,55 @@ public class AVPluginService extends AVReceiverPluginService  {
         @Override
         protected void onPostExecute(EiscpConnector conn_){
             conn=conn_;
-            ImplementListener listener=new ImplementListener(conn);
-            Thread listenerThread=new Thread(listener);
-            listenerThread.start();
+            new readMessage().execute(conn);
+            //ImplementListener listener=new ImplementListener(conn);
+            //Thread listenerThread=new Thread(listener);
+            //listenerThread.start();
         }
 
     }
-    public class ImplementListener implements Runnable, EiscpListener {
+    public class readMessage extends AsyncTask<EiscpConnector, String, Boolean> implements EiscpController{
+        private List<String> expectedCommandsReceived=Arrays.asList(EiscpConnector.MUTE, EiscpConnector.MASTER_VOL);
+       // expectedCommandsReceived.add(EiscpConnector.MUTE);
+       // expectedCommandsReceived.add(EiscpConnector.MASTER_VOL);
+        @Override
+        protected Boolean doInBackground(EiscpConnector... conn){
+            boolean success=false;
+            try {
+                conn[0].startMessageLoop(this);
+
+                success=true;
+            }catch(Exception e){
+                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e);
+            }
+            return success;
+        }
+        @Override
+        protected void onPostExecute(Boolean success){
+
+        }
+        @Override
+        public void receivedIscpMessage(String message) {
+            String command = message.substring(0, 3);
+            String parameter = message.substring(3);
+            YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Receiving message");
+            expectedCommandsReceived.remove(command);
+            lastReceivedValues.put(command, parameter);
+            //if(expectedCommandsReceived.isEmpty()){
+                //conn.close();
+            //}
+
+        }
+        @Override
+        public boolean stopReceiving(){
+            if(expectedCommandsReceived.isEmpty()){
+                conn.close();
+                return true;
+            }
+            return false;
+        }
+    }
+    /*public class ImplementListener implements Runnable, EiscpListener {
         private EiscpConnector conn;
 
         public ImplementListener(EiscpConnector conn) {
@@ -229,7 +289,7 @@ public class AVPluginService extends AVReceiverPluginService  {
         @Override
         public void run() {
             try {
-                conn.addListener(this);
+                //conn.addListener(this);
                 conn.sendIscpCommand(EiscpConnector.SYSTEM_POWER_QUERY);
                 conn.sendIscpCommand(EiscpConnector.MUTE_QUERY);
                 conn.sendIscpCommand(EiscpConnector.MASTER_VOL_QUERY);
@@ -246,5 +306,5 @@ public class AVPluginService extends AVReceiverPluginService  {
             lastReceivedValues.put(command, parameter);
         }
 
-    }
+    }*/
 }

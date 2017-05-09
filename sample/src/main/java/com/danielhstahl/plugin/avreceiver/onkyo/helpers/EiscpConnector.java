@@ -108,8 +108,11 @@ public class EiscpConnector {
 	public EiscpConnector(String address, int port) throws UnknownHostException, IOException {
 		init(address, port);
 	}
-	
-	public void addListener(EiscpListener listener) {
+	public void startMessageLoop(EiscpController listener){
+		EiscpConnectorMessageReader message=new EiscpConnectorMessageReader(socketIn, listener);
+		message.messageReader();
+	}
+	/*public void addListener(EiscpListener listener) {
 		if (eiscpConnectorReaderThreadThread == null) {
 			eiscpConnectorReaderThread = new EiscpConnectorSocketReaderThread(this, socketIn);
 			eiscpConnectorReaderThreadThread = new Thread(eiscpConnectorReaderThread);
@@ -121,7 +124,7 @@ public class EiscpConnector {
 	
 	public void removeListener(EiscpListener listener) {
 		eiscpConnectorReaderThread.removeListener(listener);
-	}
+	}*/
 	
 	private void init(String address, int port) throws UnknownHostException, IOException {
 		//log.debug("connect to " + address + ":" + port);
