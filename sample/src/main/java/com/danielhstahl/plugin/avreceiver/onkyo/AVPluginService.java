@@ -82,10 +82,10 @@ public class AVPluginService extends AVReceiverPluginService  {
     protected boolean setMuteStatus(boolean isMuted) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting mute status : %s", isMuted);
         if (isMuted)
-            sendIscpCommand(EiscpConnector.MUTE_OFF); //mute
+            sendIscpCommand(EiscpConnector.MUTE_OFF); //unmute
 
         else
-            sendIscpCommand(EiscpConnector.MUTE_OFF); //mute
+            sendIscpCommand(EiscpConnector.MUTE_ON); //mute
         mIsMuted = !isMuted;
         return true;
     }
@@ -194,7 +194,9 @@ public class AVPluginService extends AVReceiverPluginService  {
     public void sendIscpCommand(String cmd) {
         try {
             conn.sendIscpCommand(cmd);
+
         } catch (Exception ex) {
+            connectToHost(mHostUniqueId, mHostName, mHostIp);//attempt to connect if errrored
             YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when sending command: %s", ex.getMessage());
         }
     }
