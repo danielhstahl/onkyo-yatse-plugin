@@ -45,8 +45,8 @@ public class AVPluginService extends AVReceiverPluginService  {
     private String mHostUniqueId;
     private String mHostName;
     private String mHostIp;
-   // private String mReceiverPort;
-   // private String mReceiverIP;
+    private String mReceiverPort;
+    private String mReceiverIP;
     //private EiscpConnector conn=null;
     private boolean mIsMuted = false;
     private double mVolumePercent = 50;
@@ -84,9 +84,9 @@ public class AVPluginService extends AVReceiverPluginService  {
     protected boolean setMuteStatus(boolean isMuted) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting mute status : %s", isMuted);
         if (isMuted)
-            new sendIscpCommandAsync().execute(EiscpConnector.MUTE_OFF); //unmute
+            new sendIscpCommand().execute(EiscpConnector.MUTE_OFF); //unmute
         else
-            new sendIscpCommandAsync().execute(EiscpConnector.MUTE_ON); //mute
+            new sendIscpCommand().execute(EiscpConnector.MUTE_ON); //mute
         mIsMuted = !isMuted;
         return true;
     }
@@ -106,7 +106,7 @@ public class AVPluginService extends AVReceiverPluginService  {
     @Override
     protected boolean setVolumeLevel(double volume) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting volume level : %s", volume);
-        new sendIscpCommandAsync().execute(EiscpConnector.MASTER_VOL+String.format("0x%08X", (int) (volume))); //hexadecimal
+        new sendIscpCommand().execute(EiscpConnector.MASTER_VOL+String.format("0x%08X", (int) (volume))); //hexadecimal
         mVolumePercent = volume*numberOfPercentsInOne/max_volume;
         return true;
     }
@@ -118,8 +118,7 @@ public class AVPluginService extends AVReceiverPluginService  {
 
     @Override
     protected boolean volumePlus() {
-        System.out.println("volumePlus!");
-        new sendIscpCommandAsync().execute(EiscpConnector.MASTER_VOL_UP);
+        new sendIscpCommand().execute(EiscpConnector.MASTER_VOL_UP);
         mVolumePercent = Math.min(max_volume, mVolumePercent + numberOfPercentsInOne/max_volume);
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Calling volume plus");
         return true;
@@ -127,8 +126,7 @@ public class AVPluginService extends AVReceiverPluginService  {
 
     @Override
     protected boolean volumeMinus() {
-        System.out.println("volumeMinus!");
-        new sendIscpCommandAsync().execute(EiscpConnector.MASTER_VOL_DOWN);
+        new sendIscpCommand().execute(EiscpConnector.MASTER_VOL_DOWN);
         mVolumePercent = Math.max(0.0, mVolumePercent - numberOfPercentsInOne/max_volume);
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Calling volume minus");
         return true;
@@ -155,7 +153,7 @@ public class AVPluginService extends AVReceiverPluginService  {
     @Override
     protected boolean executeCustomCommand(PluginCustomCommand customCommand) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Executing CustomCommand : %s", customCommand.title());
-        new sendIscpCommandAsync().execute(customCommand.param1());
+        new sendIscpCommand().execute(customCommand.param1());
         return false;
     }
 
@@ -166,9 +164,9 @@ public class AVPluginService extends AVReceiverPluginService  {
         mHostName = name;
         mHostIp = ip;
 
-       /* mReceiverIP = PreferencesHelper.getInstance(getApplicationContext()).hostIp(mHostUniqueId);
+        mReceiverIP = PreferencesHelper.getInstance(getApplicationContext()).hostIp(mHostUniqueId);
         mReceiverPort = PreferencesHelper.getInstance(getApplicationContext()).hostPort(mHostUniqueId);
-        new connectToReceiver().execute();*/
+        new connectToReceiver().execute();
 
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Connected to : %s / %s ", name, mHostUniqueId);
     }
@@ -202,16 +200,9 @@ public class AVPluginService extends AVReceiverPluginService  {
         }
     }*/
 
-    public class sendIscpCommandAsync extends AsyncTask<String, String, String> {
+    public class sendIscpCommand extends AsyncTask<String, String, EiscpConnector> {
         @Override
-        protected String doInBackground(String... message){
-
-            String mReceiverIP = PreferencesHelper.getInstance(getApplicationContext()).hostIp(mHostUniqueId);
-            String mReceiverPort = PreferencesHelper.getInstance(getApplicationContext()).hostPort(mHostUniqueId);
-            System.out.println("IP! "+mReceiverIP);
-            System.out.println("Port! "+mReceiverPort);
-            YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Receiver IP: %s", mReceiverIP);
-            YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Receiver Port: %s", mReceiverPort);
+        protected EiscpConnector doInBackground(String... message){
             try {
                 EiscpConnector conn = new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
                 conn.sendIscpCommand(message[0]);
@@ -227,81 +218,23 @@ public class AVPluginService extends AVReceiverPluginService  {
         @Override
         protected EiscpConnector doInBackground(String... message){
             EiscpConnector conn=null;
-            String mReceiverIP = PreferencesHelper.getInstance(getApplicationContext()).hostIp(mHostUniqueId);
-            String mReceiverPort = PreferencesHelper.getInstance(getApplicationContext()).hostPort(mHostUniqueId);
-            System.out.println("IP! "+mReceiverIP);
-            System.out.println("Port! "+mReceiverPort);
-            YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Receiver IP: %s", mReceiverIP);
-            YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Receiver Port: %s", mReceiverPort);
             try {
                 conn = new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
-                conn.sendIscpCommand(EiscpConnector.MUTE_QUERY);
-                conn.sendIscpCommand(EiscpConnector.MASTER_VOL_QUERY);
             }catch(Exception e){
                 YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e);
             }
             return conn;
         }
         @Override
-        protected void onPostExecute(EiscpConnector conn){
-            new readMessage().execute(conn);
+        protected void onPostExecute(EiscpConnector conn_){
+            conn=conn_;
+            ImplementListener listener=new ImplementListener(conn);
+            Thread listenerThread=new Thread(listener);
+            listenerThread.start();
         }
+
     }
-    public class readMessage extends AsyncTask<EiscpConnector, String, Boolean> implements EiscpController{
-        private List<String> expectedCommandsReceived=Arrays.asList(EiscpConnector.MUTE, EiscpConnector.MASTER_VOL);
-       // expectedCommandsReceived.add(EiscpConnector.MUTE);
-       // expectedCommandsReceived.add(EiscpConnector.MASTER_VOL);
-        EiscpConnector conn;
-        @Override
-        protected Boolean doInBackground(EiscpConnector... conn_){
-            boolean success=false;
-            conn=conn_[0];
-            if(conn==null){
-                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "conn is null!");
-            }
-            try {
-                conn.startMessageLoop(this);
-
-                success=true;
-            }catch(Exception e){
-                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e);
-            }
-            return success;
-        }
-        @Override
-        protected void onPostExecute(Boolean success){
-
-        }
-        @Override
-        public void receivedIscpMessage(String message) {
-            String command = message.substring(0, 3);
-            String parameter = message.substring(3);
-            YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Receiving message");
-            expectedCommandsReceived.remove(command);
-            lastReceivedValues.put(command, parameter);
-            YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG,"This is receiving message!!  The message is "+message);
-            if(lastReceivedValues.get(EiscpConnector.MASTER_VOL)!=null){
-
-                mVolumePercent=(double)(Integer.parseInt(lastReceivedValues.get(EiscpConnector.MASTER_VOL), 16 ))*numberOfPercentsInOne/max_volume;
-            }
-            if(lastReceivedValues.get(EiscpConnector.MUTE)!=null) {
-                mIsMuted = lastReceivedValues.get(EiscpConnector.MUTE).equals(EiscpConnector.MUTE_ON.substring(3));
-            }
-            //if(expectedCommandsReceived.isEmpty()){
-                //conn.close();
-            //}
-
-        }
-        @Override
-        public boolean stopReceiving(){
-            if(expectedCommandsReceived.isEmpty()){
-                conn.close();
-                return true;
-            }
-            return false;
-        }
-    }
-    /*public class ImplementListener implements Runnable, EiscpListener {
+    public class ImplementListener implements Runnable, EiscpListener {
         private EiscpConnector conn;
 
         public ImplementListener(EiscpConnector conn) {
@@ -310,7 +243,7 @@ public class AVPluginService extends AVReceiverPluginService  {
         @Override
         public void run() {
             try {
-                //conn.addListener(this);
+                conn.addListener(this);
                 conn.sendIscpCommand(EiscpConnector.SYSTEM_POWER_QUERY);
                 conn.sendIscpCommand(EiscpConnector.MUTE_QUERY);
                 conn.sendIscpCommand(EiscpConnector.MASTER_VOL_QUERY);
@@ -327,5 +260,5 @@ public class AVPluginService extends AVReceiverPluginService  {
             lastReceivedValues.put(command, parameter);
         }
 
-    }*/
+    }
 }
