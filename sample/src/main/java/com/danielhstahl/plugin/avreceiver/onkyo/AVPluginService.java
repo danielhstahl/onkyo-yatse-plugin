@@ -82,10 +82,10 @@ public class AVPluginService extends AVReceiverPluginService  {
     protected boolean setMuteStatus(boolean isMuted) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting mute status : %s", isMuted);
         if (isMuted)
-            sendIscpCommand(EiscpConnector.MUTE_OFF); //unmute
+            new sendIscpCommand().execute(EiscpConnector.MUTE_OFF); //unmute
 
         else
-            sendIscpCommand(EiscpConnector.MUTE_ON); //mute
+            new sendIscpCommand().execute(EiscpConnector.MUTE_ON); //mute
         mIsMuted = !isMuted;
         return true;
     }
@@ -105,7 +105,7 @@ public class AVPluginService extends AVReceiverPluginService  {
     @Override
     protected boolean setVolumeLevel(double volume) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting volume level : %s", volume);
-        sendIscpCommand(EiscpConnector.MASTER_VOL+String.format("0x%08X", (int) (volume))); //hexadecimal
+        new sendIscpCommand().execute(EiscpConnector.MASTER_VOL+String.format("0x%08X", (int) (volume))); //hexadecimal
         mVolumePercent = volume*numberOfPercentsInOne/max_volume;
         return true;
     }
@@ -117,7 +117,7 @@ public class AVPluginService extends AVReceiverPluginService  {
 
     @Override
     protected boolean volumePlus() {
-        sendIscpCommand(EiscpConnector.MASTER_VOL_UP);
+        new sendIscpCommand().execute(EiscpConnector.MASTER_VOL_UP);
         mVolumePercent = Math.min(max_volume, mVolumePercent + numberOfPercentsInOne/max_volume);
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Calling volume plus");
         return true;
@@ -125,7 +125,7 @@ public class AVPluginService extends AVReceiverPluginService  {
 
     @Override
     protected boolean volumeMinus() {
-        sendIscpCommand(EiscpConnector.MASTER_VOL_DOWN);
+        new sendIscpCommand().execute(EiscpConnector.MASTER_VOL_DOWN);
         mVolumePercent = Math.max(0.0, mVolumePercent - numberOfPercentsInOne/max_volume);
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Calling volume minus");
         return true;
@@ -155,7 +155,7 @@ public class AVPluginService extends AVReceiverPluginService  {
     @Override
     protected boolean executeCustomCommand(PluginCustomCommand customCommand) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Executing CustomCommand : %s", customCommand.title());
-        sendIscpCommand(customCommand.param1());
+        new sendIscpCommand().execute(customCommand.param1());
         return false;
     }
 
@@ -191,7 +191,7 @@ public class AVPluginService extends AVReceiverPluginService  {
         return result;
     }
 
-    public void sendIscpCommand(String cmd) {
+    /*public void sendIscpCommand(String cmd) {
         try {
             conn.sendIscpCommand(cmd);
 
@@ -199,6 +199,20 @@ public class AVPluginService extends AVReceiverPluginService  {
             connectToHost(mHostUniqueId, mHostName, mHostIp);//attempt to connect if errrored
             YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when sending command: %s", ex.getMessage());
         }
+    }*/
+    public class sendIscpCommand extends AsyncTask<String, String, EiscpConnector> {
+        @Override
+        protected EiscpConnector doInBackground(String... message){
+            try {
+                EiscpConnector conn = new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
+                conn.sendIscpCommand(message[0]);
+                conn.close();
+            }catch(Exception e){
+                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e);
+            }
+            return null;
+        }
+
     }
     public class connectToReceiver extends AsyncTask<String, String, EiscpConnector> {
         @Override
