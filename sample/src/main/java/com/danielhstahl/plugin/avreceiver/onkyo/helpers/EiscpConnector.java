@@ -90,8 +90,8 @@ public class EiscpConnector {
 		
 		String responseString = EiscpProtocolHelper.interpreteEiscpResponse(receivedMessage);
 		String address = pct.getAddress().getHostAddress().toString();
-		EiscpConnector conn = new EiscpConnector(address, responseString);
-		return conn;
+		//EiscpConnector conn = new EiscpConnector(address, responseString);
+		return new EiscpConnector(address, responseString);
 	}
 
 

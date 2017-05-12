@@ -51,7 +51,7 @@ import com.danielhstahl.plugin.avreceiver.onkyo.helpers.PreferencesHelper;
 public class SettingsActivity extends AppCompatActivity  {
 
     private static final String TAG = "SettingsActivity";
-    private EiscpConnector conn;
+   // private EiscpConnector conn;
     private String mMediaCenterUniqueId;
     private String mMediaCenterName;
     private boolean mMuted;
@@ -71,7 +71,7 @@ public class SettingsActivity extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        //System.out.println("This makes no sense");
         setContentView(R.layout.activity_settings);
         ButterKnife.bind(this);
         if (getIntent() != null) {
@@ -142,10 +142,12 @@ public class SettingsActivity extends AppCompatActivity  {
         @Override
         protected EiscpConnector doInBackground(String... message){
             try {
-                conn = new EiscpConnector(threadedIP, Integer.parseInt(threadedPort));
+                EiscpConnector conn = new EiscpConnector(threadedIP, Integer.parseInt(threadedPort));
                 conn.sendIscpCommand(message[0]);
                 conn.close();
+                System.out.println("task tested");
             }catch(Exception e){
+                System.out.println(e);
                 YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e);
             }
             return null;
@@ -157,9 +159,9 @@ public class SettingsActivity extends AppCompatActivity  {
         protected String doInBackground(String... message){
             String address=null;
             try {
-                conn = EiscpConnector.autodiscover();
+                EiscpConnector conn = EiscpConnector.autodiscover();
                 address=conn.getAddress();
-
+                System.out.println("address gotten");
                 conn.close();
             }catch(Exception e){
                 YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when scanning: %s", e);
