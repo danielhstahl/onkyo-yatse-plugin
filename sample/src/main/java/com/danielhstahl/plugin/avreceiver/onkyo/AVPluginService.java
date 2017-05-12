@@ -29,7 +29,7 @@ import tv.yatse.plugin.avreceiver.api.AVReceiverPluginService;
 import tv.yatse.plugin.avreceiver.api.PluginCustomCommand;
 import tv.yatse.plugin.avreceiver.api.YatseLogger;
 import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpConnector;
-import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpController;
+import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpListener;
 import com.danielhstahl.plugin.avreceiver.onkyo.helpers.PreferencesHelper;
 
 
@@ -47,22 +47,21 @@ public class AVPluginService extends AVReceiverPluginService  {
     private String mHostIp;
     private String mReceiverPort;
     private String mReceiverIP;
-    //private EiscpConnector conn=null;
+    private EiscpConnector conn=null;
     private boolean mIsMuted = false;
     private double mVolumePercent = 50;
     private static final double max_volume=100;
     private static final double numberOfPercentsInOne=100.0;
     @Override
     public void onCreate() {
-        System.out.println("Creating AVPLUGIN");
         super.onCreate();
     }
 
-    /*@Override
+    @Override
     public void onDestroy() {
         if (conn != null)
             conn.close();
-    }*/
+    }
 
 
     @Override
