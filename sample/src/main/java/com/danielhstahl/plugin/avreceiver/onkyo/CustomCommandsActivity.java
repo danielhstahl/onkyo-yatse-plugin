@@ -17,11 +17,11 @@
 package com.danielhstahl.plugin.avreceiver.onkyo;
 
 import android.os.Bundle;
-import android.text.method.LinkMovementMethod;
+import android.net.Uri;
 import android.view.View;
 import android.widget.TextView;
 import butterknife.BindView;
-import 	android.text.Html;
+import android.content.Intent;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import tv.yatse.plugin.avreceiver.api.AVReceiverCustomCommandsAppCompatActivity;
@@ -45,8 +45,9 @@ public class CustomCommandsActivity extends AVReceiverCustomCommandsAppCompatAct
         if (isEditing()) {
             mViewTitle.setText(pluginCustomCommand.title());
             mViewParam1.setText(pluginCustomCommand.param1());
-            mViewUrl.setClickable(true);
-            mViewUrl.setMovementMethod(LinkMovementMethod.getInstance());
+
+            //mViewUrl.setClickable(true);
+            //mViewUrl.setMovementMethod(LinkMovementMethod.getInstance());
             //String text = "<a href='http://michael.elsdoerfer.name/onkyo/'>Get codes here.</a>";
             //mViewUrl.setText(Html.fromHtml(text));
 
@@ -55,7 +56,7 @@ public class CustomCommandsActivity extends AVReceiverCustomCommandsAppCompatAct
         }
     }
 
-    @OnClick({R.id.btn_save, R.id.btn_cancel})
+    @OnClick({R.id.btn_save, R.id.btn_cancel, R.id.url_to_commands})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_cancel:
@@ -68,7 +69,17 @@ public class CustomCommandsActivity extends AVReceiverCustomCommandsAppCompatAct
                 pluginCustomCommand.param1(String.valueOf(mViewParam1.getText()));
                 saveAndFinish();
                 break;
+            case R.id.url_to_commands:
+                // Custom command source field must always equals to plugin uniqueId !!
+                openWebPage("http://michael.elsdoerfer.name/onkyo/");
+                break;
         }
     }
-
+    public void openWebPage(String url) {
+        Uri webpage = Uri.parse(url);
+        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
 }
