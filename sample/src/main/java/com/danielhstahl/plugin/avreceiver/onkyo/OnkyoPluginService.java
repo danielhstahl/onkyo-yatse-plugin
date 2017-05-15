@@ -42,7 +42,7 @@ import tv.yatse.plugin.avreceiver.api.YatseLogger;
 public class OnkyoPluginService extends AVReceiverPluginService {
     private Handler handler = new Handler(Looper.getMainLooper());
     private static final String TAG = "OnkyoPluginService";
-    private Map<String, String> lastReceivedValues = new HashMap<String, String>();
+    private Map<String, String> lastReceivedValues = new HashMap<>();
     private String mHostUniqueId;
     private String mHostName;
     private String mHostIp;
@@ -65,7 +65,6 @@ public class OnkyoPluginService extends AVReceiverPluginService {
             conn.close();
     }
 
-
     @Override
     protected int getVolumeUnitType() {
         return UNIT_TYPE_PERCENT;
@@ -86,7 +85,6 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting mute status : %s", isMuted);
         if (isMuted)
             new sendIscpCommand().execute(EiscpConnector.MUTE_OFF); //unmute
-
         else
             new sendIscpCommand().execute(EiscpConnector.MUTE_ON); //mute
         mIsMuted = !isMuted;
