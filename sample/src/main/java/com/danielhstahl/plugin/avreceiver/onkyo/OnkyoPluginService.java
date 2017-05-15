@@ -211,7 +211,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
                 conn.sendIscpCommand(message[0]);
                 conn.close();
             } catch (Exception e) {
-                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e);
+                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e.getMessage());
             }
             return null;
         }
@@ -225,7 +225,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
             try {
                 conn = new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
             } catch (Exception e) {
-                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e);
+                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e.getMessage());
             }
             return conn;
         }
@@ -254,7 +254,6 @@ public class OnkyoPluginService extends AVReceiverPluginService {
                 conn.sendIscpCommand(EiscpConnector.SYSTEM_POWER_QUERY);
                 conn.sendIscpCommand(EiscpConnector.MUTE_QUERY);
                 conn.sendIscpCommand(EiscpConnector.MASTER_VOL_QUERY);
-
             } catch (Exception ex) {
                 YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when adding listener: %s", ex.getMessage());
             }
