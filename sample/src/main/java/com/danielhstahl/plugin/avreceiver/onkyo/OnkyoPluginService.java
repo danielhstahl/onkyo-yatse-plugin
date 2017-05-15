@@ -37,9 +37,9 @@ import com.danielhstahl.plugin.avreceiver.onkyo.helpers.PreferencesHelper;
  * <p/>
  * See {@link AVReceiverPluginService} for documentation on all functions
  */
-public class AVPluginService extends AVReceiverPluginService  {
+public class OnkyoPluginService extends AVReceiverPluginService  {
     private Handler handler = new Handler(Looper.getMainLooper());
-    private static final String TAG = "AVPluginService";
+    private static final String TAG = "OnkyoPluginService";
     private Map<String, String> lastReceivedValues = new HashMap<String, String>();
     private String mHostUniqueId;
     private String mHostName;
