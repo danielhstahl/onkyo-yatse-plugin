@@ -209,13 +209,24 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
     }
 
-    /* I have to do async since I cannot initialize "EiscpConnector" on the main thread */
-    public class connectToReceiver extends AsyncTask<String, String, EiscpConnector> {
+    private EiscpListener eiscpListener = new EiscpListener() {
         @Override
-        protected EiscpConnector doInBackground(String... message) {
+        public void receivedIscpMessage(String message) {
+            String command = message.substring(0, 3);
+            String parameter = message.substring(3);
+            YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Receiving message");
+            lastReceivedValues.put(command, parameter);
+        }
+    };
+
+    /* I have to do async since I cannot initialize "EiscpConnector" on the main thread */
+    public class connectToReceiver extends AsyncTask<String, String, Void> {
+        @Override
+        protected Void doInBackground(String... message) {
             if (conn != null) {
                 try {
                     conn.close();
+                    conn = null;
                 } catch (Exception ignore) {
                 }
             }
@@ -224,43 +235,16 @@ public class OnkyoPluginService extends AVReceiverPluginService {
             } catch (Exception e) {
                 YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e.getMessage());
             }
-            return conn;
-        }
-
-        @Override
-        protected void onPostExecute(EiscpConnector conn_) {
-            conn = conn_;
-            ImplementListener listener = new ImplementListener(conn);
-            Thread listenerThread = new Thread(listener);
-            listenerThread.start();
-        }
-
-    }
-
-    public class ImplementListener implements Runnable, EiscpListener {
-        private EiscpConnector conn;
-
-        public ImplementListener(EiscpConnector conn) {
-            this.conn = conn;
-        }
-
-        @Override
-        public void run() {
-            try {
-                /* this runs once, spawns the "loop" which tracks receiver */
-                conn.addListener(this);
-            } catch (Exception ex) {
-                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when adding listener: %s", ex.getMessage());
+            if (conn != null) {
+                try {
+                    /* this runs once, spawns the "loop" which tracks receiver */
+                    conn.addListener(eiscpListener);
+                } catch (Exception ex) {
+                    YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when adding listener: %s", ex.getMessage());
+                }
             }
+            return null;
         }
-
-        @Override
-        public void receivedIscpMessage(String message) {
-            String command = message.substring(0, 3);
-            String parameter = message.substring(3);
-            YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Receiving message");
-            lastReceivedValues.put(command, parameter);
-        }
-
     }
+
 }
