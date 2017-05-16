@@ -1,0 +1,9 @@
+## Sample release.properties file
+#
+# Copy this file to release.properties and fill the correct values
+#
+
+keystore=./release.keystore
+alias=org.sample.alias
+keystore.password=keystorepass
+alias.password=aliaspass

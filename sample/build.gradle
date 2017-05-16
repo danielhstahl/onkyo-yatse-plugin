@@ -17,6 +17,23 @@
 apply plugin: 'com.android.application'
 
 android {
+
+    File signingProperties = file('release.properties')
+
+    signingConfigs {
+        //noinspection GroovyMissingReturnStatement
+        release {
+            if (signingProperties.exists()) {
+                def Properties keyProps = new Properties()
+                keyProps.load(new FileInputStream(signingProperties))
+                storeFile file(keyProps["keystore"])
+                keyAlias keyProps["alias"]
+                storePassword keyProps["keystore.password"]
+                keyPassword keyProps["alias.password"]
+            }
+        }
+    }
+
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
 
@@ -31,6 +48,12 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlignEnabled true
+            if (signingProperties.exists()) {
+                //noinspection GrUnresolvedAccess
+                //noinspection GroovyAssignabilityCheck
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
