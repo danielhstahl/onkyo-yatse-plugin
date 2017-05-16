@@ -44,6 +44,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     private static final String TAG = "OnkyoPluginService";
     private Map<String, String> lastReceivedValues = new HashMap<>();
     private String mHostUniqueId;
+    EiscpConnector conn;
     private String mHostName;
     private String mHostIp;
     private String mReceiverPort;
@@ -58,11 +59,11 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         super.onCreate();
     }
 
-    /*@Override
+    @Override
     public void onDestroy() {
         if (conn != null)
             conn.close();
-    }*/
+    }
 
     @Override
     protected int getVolumeUnitType() {
@@ -167,9 +168,9 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
         mReceiverIP = PreferencesHelper.getInstance(getApplicationContext()).hostIp(mHostUniqueId);
         mReceiverPort = PreferencesHelper.getInstance(getApplicationContext()).hostPort(mHostUniqueId);
-        ImplementListener listener = new ImplementListener();
-        //Thread listenerThread = new Thread(listener);
-        //listenerThread.start();
+        ImplementListener listener=new ImplementListener();
+        Thread listenerThread = new Thread(listener);
+        listenerThread.start();
 
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Connected to : %s / %s ", name, mHostUniqueId);
     }
@@ -209,31 +210,25 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     }
 
 
-    public class ImplementListener implements EiscpListener {
+    public class ImplementListener implements Runnable, EiscpListener {
 
         public ImplementListener() {
-            try{
-                EiscpConnector conn = new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
-                conn.addListener(this);
-                conn.sendIscpCommand(EiscpConnector.SYSTEM_POWER_QUERY);
-                conn.sendIscpCommand(EiscpConnector.MUTE_QUERY);
-                conn.sendIscpCommand(EiscpConnector.MASTER_VOL_QUERY);
-            }
-            catch (Exception ex) {
-                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when instantiating connector: %s", ex.getMessage());
-            }
         }
-      /*  @Override
+        @Override
         public void run() {
             try {
+                conn = new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
+
                 conn.addListener(this);
-                conn.sendIscpCommand(EiscpConnector.SYSTEM_POWER_QUERY);
-                conn.sendIscpCommand(EiscpConnector.MUTE_QUERY);
-                conn.sendIscpCommand(EiscpConnector.MASTER_VOL_QUERY);
+                //while(run) {
+                    //conn.sendIscpCommand(EiscpConnector.SYSTEM_POWER_QUERY);
+                    //conn.sendIscpCommand(EiscpConnector.MUTE_QUERY);
+                    //conn.sendIscpCommand(EiscpConnector.MASTER_VOL_QUERY);
+               // }
             } catch (Exception ex) {
                 YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when adding listener: %s", ex.getMessage());
             }
-        }*/
+        }
 
         @Override
         public void receivedIscpMessage(String message) {
