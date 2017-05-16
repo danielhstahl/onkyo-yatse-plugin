@@ -200,26 +200,12 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     }
     void sendIscpCommand(String message){
         try{
-            conn.sendIscpCommand(message[0]);
+            conn.sendIscpCommand(message);
         }   
         catch (Exception e) {
             YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when sending command: %s", e.getMessage());
         }
     }
-    /*private class sendIscpCommand extends AsyncTask<String, String, EiscpConnector> {
-        @Override
-        protected EiscpConnector doInBackground(String... message) {
-            try {
-                EiscpConnector conn = new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
-                conn.sendIscpCommand(message[0]);
-                conn.close();
-            } catch (Exception e) {
-                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e.getMessage());
-            }
-            return null;
-        }
-
-    }*/
 
     private EiscpListener eiscpListener = new EiscpListener() {
         @Override
