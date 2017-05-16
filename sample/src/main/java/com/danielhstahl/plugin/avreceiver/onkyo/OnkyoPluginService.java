@@ -192,15 +192,6 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         return result;
     }
 
-    /*public void sendIscpCommand(String cmd) {
-        try {
-            conn.sendIscpCommand(cmd);
-
-        } catch (Exception ex) {
-            connectToHost(mHostUniqueId, mHostName, mHostIp);//attempt to connect if errrored
-            YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when sending command: %s", ex.getMessage());
-        }
-    }*/
     public class sendIscpCommand extends AsyncTask<String, String, EiscpConnector> {
         @Override
         protected EiscpConnector doInBackground(String... message) {
@@ -216,10 +207,11 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
     }
 
+    /**I have to do async since I cannot initialize "EiscpConnector" on the main thread */
     public class connectToReceiver extends AsyncTask<String, String, EiscpConnector> {
         @Override
         protected EiscpConnector doInBackground(String... message) {
-            EiscpConnector conn = null;
+            //EiscpConnector conn = null;
             try {
                 conn = new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
             } catch (Exception e) {
@@ -248,10 +240,11 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         @Override
         public void run() {
             try {
+                /**this runs once, spawns the "loop" which tracks receiver */
                 conn.addListener(this);
-                conn.sendIscpCommand(EiscpConnector.SYSTEM_POWER_QUERY);
-                conn.sendIscpCommand(EiscpConnector.MUTE_QUERY);
-                conn.sendIscpCommand(EiscpConnector.MASTER_VOL_QUERY);
+                //conn.sendIscpCommand(EiscpConnector.SYSTEM_POWER_QUERY);
+                //conn.sendIscpCommand(EiscpConnector.MUTE_QUERY);
+                //conn.sendIscpCommand(EiscpConnector.MASTER_VOL_QUERY);
             } catch (Exception ex) {
                 YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when adding listener: %s", ex.getMessage());
             }
