@@ -211,7 +211,6 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     public class connectToReceiver extends AsyncTask<String, String, EiscpConnector> {
         @Override
         protected EiscpConnector doInBackground(String... message) {
-            //EiscpConnector conn = null;
             try {
                 conn = new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
             } catch (Exception e) {
@@ -242,9 +241,6 @@ public class OnkyoPluginService extends AVReceiverPluginService {
             try {
                 /**this runs once, spawns the "loop" which tracks receiver */
                 conn.addListener(this);
-                //conn.sendIscpCommand(EiscpConnector.SYSTEM_POWER_QUERY);
-                //conn.sendIscpCommand(EiscpConnector.MUTE_QUERY);
-                //conn.sendIscpCommand(EiscpConnector.MASTER_VOL_QUERY);
             } catch (Exception ex) {
                 YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when adding listener: %s", ex.getMessage());
             }
