@@ -46,13 +46,6 @@ public class CustomCommandsActivity extends AVReceiverCustomCommandsAppCompatAct
             mViewTitle.setText(pluginCustomCommand.title());
             mViewParam1.setText(pluginCustomCommand.param1());
 
-            //mViewUrl.setClickable(true);
-            //mViewUrl.setMovementMethod(LinkMovementMethod.getInstance());
-            //String text = "<a href='http://michael.elsdoerfer.name/onkyo/'>Get codes here.</a>";
-            //mViewUrl.setText(Html.fromHtml(text));
-
-
-            //mViewUrl.setMovementMethod(LinkMovementMethod.getInstance());
         }
     }
 
