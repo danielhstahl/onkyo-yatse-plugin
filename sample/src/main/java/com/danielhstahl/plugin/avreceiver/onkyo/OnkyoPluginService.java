@@ -17,8 +17,6 @@
 package com.danielhstahl.plugin.avreceiver.onkyo;
 
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 
 import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpConnector;
@@ -41,7 +39,7 @@ import tv.yatse.plugin.avreceiver.api.YatseLogger;
  * See {@link AVReceiverPluginService} for documentation on all functions
  */
 public class OnkyoPluginService extends AVReceiverPluginService {
-    private Handler handler = new Handler(Looper.getMainLooper());
+
     private static final String TAG = "OnkyoPluginService";
     private Map<String, String> lastReceivedValues = new HashMap<>();
     private String mHostUniqueId;
@@ -85,7 +83,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
     @Override
     protected boolean setMuteStatus(boolean isMuted) {
-        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting mute status : %s", isMuted);
+        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting mute status: %s", isMuted);
         if (isMuted)
             new sendIscpCommand().execute(EiscpConnector.MUTE_OFF); //unmute
         else
@@ -108,7 +106,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
     @Override
     protected boolean setVolumeLevel(double volume) {
-        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting volume level : %s", volume);
+        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting volume level: %s", volume);
         new sendIscpCommand().execute(EiscpConnector.MASTER_VOL + String.format("0x%08X", (int) (volume))); //hexadecimal
         mVolumePercent = volume * numberOfPercentsInOne / max_volume;
         return true;
@@ -176,7 +174,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         mReceiverPort = PreferencesHelper.getInstance(getApplicationContext()).hostPort(mHostUniqueId);
         new connectToReceiver().execute();
 
-        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Connected to : %s / %s ", name, mHostUniqueId);
+        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Connected to: %s / %s ", name, mHostUniqueId);
     }
 
     @Override
