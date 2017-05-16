@@ -193,7 +193,9 @@ public class EiscpConnector {
 		try {
 			socketOut.close();
 		} catch (Exception ex) {}
-
+		try {
+			socketIn.close();
+		} catch (Exception ex) {}
 		try {
 			socket.close();
 		} catch (Exception ex) {}

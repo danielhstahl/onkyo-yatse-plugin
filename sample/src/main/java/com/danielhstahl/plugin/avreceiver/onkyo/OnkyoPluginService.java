@@ -17,8 +17,7 @@
 package com.danielhstahl.plugin.avreceiver.onkyo;
 
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
+import android.text.TextUtils;
 
 import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpConnector;
 import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpListener;
@@ -40,7 +39,7 @@ import tv.yatse.plugin.avreceiver.api.YatseLogger;
  * See {@link AVReceiverPluginService} for documentation on all functions
  */
 public class OnkyoPluginService extends AVReceiverPluginService {
-    private Handler handler = new Handler(Looper.getMainLooper());
+
     private static final String TAG = "OnkyoPluginService";
     private Map<String, String> lastReceivedValues = new HashMap<>();
     private String mHostUniqueId;
@@ -61,8 +60,10 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
     @Override
     public void onDestroy() {
-        if (conn != null)
+        if (conn != null) {
             conn.close();
+            conn = null;
+        }
     }
 
     @Override
@@ -82,7 +83,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
     @Override
     protected boolean setMuteStatus(boolean isMuted) {
-        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting mute status : %s", isMuted);
+        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting mute status: %s", isMuted);
         if (isMuted)
             new sendIscpCommand().execute(EiscpConnector.MUTE_OFF); //unmute
         else
@@ -105,7 +106,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
     @Override
     protected boolean setVolumeLevel(double volume) {
-        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting volume level : %s", volume);
+        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting volume level: %s", volume);
         new sendIscpCommand().execute(EiscpConnector.MASTER_VOL + String.format("0x%08X", (int) (volume))); //hexadecimal
         mVolumePercent = volume * numberOfPercentsInOne / max_volume;
         return true;
@@ -141,6 +142,10 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         if (lastReceivedValues.get(EiscpConnector.MUTE) != null) {
             mIsMuted = lastReceivedValues.get(EiscpConnector.MUTE).equals("01");
         }
+        if (conn == null) {
+            // Was disconnected from receiver, try to reconnect
+            new connectToReceiver().execute();
+        }
         return true;
     }
 
@@ -149,15 +154,18 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         String source = getString(R.string.plugin_unique_id);
         List<PluginCustomCommand> commands = new ArrayList<>();
         // Plugin custom commands must set the source parameter to their plugin unique Id !
-        commands.add(new PluginCustomCommand().title("Sample command: Volume Up").source(source).param1(EiscpConnector.MASTER_VOL_UP).type(0));
+        commands.add(new PluginCustomCommand().title("Power: ON").source(source).param1(EiscpConnector.SYSTEM_POWER_ON).type(0));
+        commands.add(new PluginCustomCommand().title("Power: Standby").source(source).param1(EiscpConnector.SYSTEM_POWER_STANDBY).type(0));
         return commands;
     }
 
     @Override
     protected boolean executeCustomCommand(PluginCustomCommand customCommand) {
-        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Executing CustomCommand : %s", customCommand.title());
-        new sendIscpCommand().execute(customCommand.param1());
-        return false;
+        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Executing CustomCommand: %s", customCommand.title());
+        if (!TextUtils.isEmpty(customCommand.param1())) {
+            new sendIscpCommand().execute(customCommand.param1());
+        }
+        return true;
     }
 
     @Override
@@ -170,7 +178,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         mReceiverPort = PreferencesHelper.getInstance(getApplicationContext()).hostPort(mHostUniqueId);
         new connectToReceiver().execute();
 
-        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Connected to : %s / %s ", name, mHostUniqueId);
+        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Connected to: %s / %s ", name, mHostUniqueId);
     }
 
     @Override
@@ -192,7 +200,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         return result;
     }
 
-    public class sendIscpCommand extends AsyncTask<String, String, EiscpConnector> {
+    private class sendIscpCommand extends AsyncTask<String, String, EiscpConnector> {
         @Override
         protected EiscpConnector doInBackground(String... message) {
             try {
@@ -207,45 +215,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
     }
 
-    /**I have to do async since I cannot initialize "EiscpConnector" on the main thread */
-    public class connectToReceiver extends AsyncTask<String, String, EiscpConnector> {
-        @Override
-        protected EiscpConnector doInBackground(String... message) {
-            try {
-                conn = new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
-            } catch (Exception e) {
-                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e.getMessage());
-            }
-            return conn;
-        }
-
-        @Override
-        protected void onPostExecute(EiscpConnector conn_) {
-            conn = conn_;
-            ImplementListener listener = new ImplementListener(conn);
-            Thread listenerThread = new Thread(listener);
-            listenerThread.start();
-        }
-
-    }
-
-    public class ImplementListener implements Runnable, EiscpListener {
-        private EiscpConnector conn;
-
-        public ImplementListener(EiscpConnector conn) {
-            this.conn = conn;
-        }
-
-        @Override
-        public void run() {
-            try {
-                /**this runs once, spawns the "loop" which tracks receiver */
-                conn.addListener(this);
-            } catch (Exception ex) {
-                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when adding listener: %s", ex.getMessage());
-            }
-        }
-
+    private EiscpListener eiscpListener = new EiscpListener() {
         @Override
         public void receivedIscpMessage(String message) {
             String command = message.substring(0, 3);
@@ -254,5 +224,44 @@ public class OnkyoPluginService extends AVReceiverPluginService {
             lastReceivedValues.put(command, parameter);
         }
 
+        @Override
+        public void disconnected() {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ignore) {
+                }
+                conn = null;
+            }
+        }
+    };
+
+    /* I have to do async since I cannot initialize "EiscpConnector" on the main thread */
+    private class connectToReceiver extends AsyncTask<String, String, Void> {
+        @Override
+        protected Void doInBackground(String... message) {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ignore) {
+                }
+                conn = null;
+            }
+            try {
+                conn = new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
+            } catch (Exception e) {
+                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e.getMessage());
+            }
+            if (conn != null) {
+                try {
+                    /* this runs once, spawns the "loop" which tracks receiver */
+                    conn.addListener(eiscpListener);
+                } catch (Exception ex) {
+                    YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when adding listener: %s", ex.getMessage());
+                }
+            }
+            return null;
+        }
     }
+
 }
