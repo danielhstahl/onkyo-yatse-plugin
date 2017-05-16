@@ -19,6 +19,7 @@ package com.danielhstahl.plugin.avreceiver.onkyo;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 
 import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpConnector;
 import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpListener;
@@ -151,15 +152,18 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         String source = getString(R.string.plugin_unique_id);
         List<PluginCustomCommand> commands = new ArrayList<>();
         // Plugin custom commands must set the source parameter to their plugin unique Id !
-        commands.add(new PluginCustomCommand().title("Sample command: Volume Up").source(source).param1(EiscpConnector.MASTER_VOL_UP).type(0));
+        commands.add(new PluginCustomCommand().title("Power: ON").source(source).param1(EiscpConnector.SYSTEM_POWER_ON).type(0));
+        commands.add(new PluginCustomCommand().title("Power: Standby").source(source).param1(EiscpConnector.SYSTEM_POWER_STANDBY).type(0));
         return commands;
     }
 
     @Override
     protected boolean executeCustomCommand(PluginCustomCommand customCommand) {
-        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Executing CustomCommand : %s", customCommand.title());
-        new sendIscpCommand().execute(customCommand.param1());
-        return false;
+        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Executing CustomCommand: %s", customCommand.title());
+        if (!TextUtils.isEmpty(customCommand.param1())) {
+            new sendIscpCommand().execute(customCommand.param1());
+        }
+        return true;
     }
 
     @Override
