@@ -196,7 +196,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         return result;
     }
 
-    public class sendIscpCommand extends AsyncTask<String, String, EiscpConnector> {
+    private class sendIscpCommand extends AsyncTask<String, String, EiscpConnector> {
         @Override
         protected EiscpConnector doInBackground(String... message) {
             try {
@@ -222,7 +222,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     };
 
     /* I have to do async since I cannot initialize "EiscpConnector" on the main thread */
-    public class connectToReceiver extends AsyncTask<String, String, Void> {
+    private class connectToReceiver extends AsyncTask<String, String, Void> {
         @Override
         protected Void doInBackground(String... message) {
             if (conn != null) {
