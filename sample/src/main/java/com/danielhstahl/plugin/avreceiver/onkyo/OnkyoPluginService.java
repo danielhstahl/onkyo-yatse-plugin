@@ -61,8 +61,10 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
     @Override
     public void onDestroy() {
-        if (conn != null)
+        if (conn != null) {
             conn.close();
+            conn = null;
+        }
     }
 
     @Override
@@ -207,10 +209,16 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
     }
 
-    /**I have to do async since I cannot initialize "EiscpConnector" on the main thread */
+    /* I have to do async since I cannot initialize "EiscpConnector" on the main thread */
     public class connectToReceiver extends AsyncTask<String, String, EiscpConnector> {
         @Override
         protected EiscpConnector doInBackground(String... message) {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ignore) {
+                }
+            }
             try {
                 conn = new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
             } catch (Exception e) {
@@ -239,7 +247,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         @Override
         public void run() {
             try {
-                /**this runs once, spawns the "loop" which tracks receiver */
+                /* this runs once, spawns the "loop" which tracks receiver */
                 conn.addListener(this);
             } catch (Exception ex) {
                 YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when adding listener: %s", ex.getMessage());
