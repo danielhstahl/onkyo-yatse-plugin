@@ -85,9 +85,9 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     protected boolean setMuteStatus(boolean isMuted) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting mute status: %s", isMuted);
         if (isMuted)
-            new sendIscpCommand().execute(EiscpConnector.MUTE_OFF); //unmute
+            sendIscpCommand(EiscpConnector.MUTE_OFF); //unmute
         else
-            new sendIscpCommand().execute(EiscpConnector.MUTE_ON); //mute
+            sendIscpCommand(EiscpConnector.MUTE_ON); //mute
         mIsMuted = !isMuted;
         return true;
     }
@@ -107,7 +107,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     @Override
     protected boolean setVolumeLevel(double volume) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting volume level: %s", volume);
-        new sendIscpCommand().execute(EiscpConnector.MASTER_VOL + String.format("0x%08X", (int) (volume))); //hexadecimal
+        sendIscpCommand(EiscpConnector.MASTER_VOL + String.format("0x%08X", (int) (volume))); //hexadecimal
         mVolumePercent = volume * numberOfPercentsInOne / max_volume;
         return true;
     }
@@ -119,7 +119,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
     @Override
     protected boolean volumePlus() {
-        new sendIscpCommand().execute(EiscpConnector.MASTER_VOL_UP);
+        sendIscpCommand(EiscpConnector.MASTER_VOL_UP);
         mVolumePercent = Math.min(max_volume, mVolumePercent + numberOfPercentsInOne / max_volume);
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Calling volume plus");
         return true;
@@ -127,7 +127,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
     @Override
     protected boolean volumeMinus() {
-        new sendIscpCommand().execute(EiscpConnector.MASTER_VOL_DOWN);
+        sendIscpCommand(EiscpConnector.MASTER_VOL_DOWN);
         mVolumePercent = Math.max(0.0, mVolumePercent - numberOfPercentsInOne / max_volume);
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Calling volume minus");
         return true;
@@ -163,7 +163,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     protected boolean executeCustomCommand(PluginCustomCommand customCommand) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Executing CustomCommand: %s", customCommand.title());
         if (!TextUtils.isEmpty(customCommand.param1())) {
-            new sendIscpCommand().execute(customCommand.param1());
+            sendIscpCommand(customCommand.param1());
         }
         return true;
     }
@@ -198,8 +198,15 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         }
         return result;
     }
-
-    private class sendIscpCommand extends AsyncTask<String, String, EiscpConnector> {
+    void sendIscpCommand(String message){
+        try{
+            conn.sendIscpCommand(message[0]);
+        }   
+        catch (Exception e) {
+            YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when sending command: %s", e.getMessage());
+        }
+    }
+    /*private class sendIscpCommand extends AsyncTask<String, String, EiscpConnector> {
         @Override
         protected EiscpConnector doInBackground(String... message) {
             try {
@@ -212,7 +219,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
             return null;
         }
 
-    }
+    }*/
 
     private EiscpListener eiscpListener = new EiscpListener() {
         @Override
