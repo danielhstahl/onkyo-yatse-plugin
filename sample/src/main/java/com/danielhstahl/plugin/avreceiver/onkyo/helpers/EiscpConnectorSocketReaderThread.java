@@ -83,6 +83,13 @@ public class EiscpConnectorSocketReaderThread implements Runnable {
                 quit();
             }
         }
+        fireDisconnectMessage();
+    }
+
+    public void fireDisconnectMessage() {
+        for (EiscpListener listener : listenerList) {
+            listener.disconnected();
+        }
     }
 
     public void fireReceivedIscpMessage(String iscpResult) {

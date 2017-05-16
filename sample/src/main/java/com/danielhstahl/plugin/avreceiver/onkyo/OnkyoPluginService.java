@@ -142,6 +142,10 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         if (lastReceivedValues.get(EiscpConnector.MUTE) != null) {
             mIsMuted = lastReceivedValues.get(EiscpConnector.MUTE).equals("01");
         }
+        if (conn == null) {
+            // Was disconnected from receiver, try to reconnect
+            new connectToReceiver().execute();
+        }
         return true;
     }
 
@@ -218,6 +222,17 @@ public class OnkyoPluginService extends AVReceiverPluginService {
             String parameter = message.substring(3);
             YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Receiving message");
             lastReceivedValues.put(command, parameter);
+        }
+
+        @Override
+        public void disconnected() {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception ignore) {
+                }
+                conn = null;
+            }
         }
     };
 
