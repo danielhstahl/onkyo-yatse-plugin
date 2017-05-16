@@ -243,9 +243,9 @@ public class OnkyoPluginService extends AVReceiverPluginService {
             if (conn != null) {
                 try {
                     conn.close();
-                    conn = null;
                 } catch (Exception ignore) {
                 }
+                conn = null;
             }
             try {
                 conn = new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
