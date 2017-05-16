@@ -176,10 +176,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
         mReceiverIP = PreferencesHelper.getInstance(getApplicationContext()).hostIp(mHostUniqueId);
         mReceiverPort = PreferencesHelper.getInstance(getApplicationContext()).hostPort(mHostUniqueId);
-        ImplementListener listener=new ImplementListener();
-        Thread listenerThread = new Thread(listener);
-        listenerThread.start();
-
+        new connectToReceiver().execute();
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Connected to: %s / %s ", name, mHostUniqueId);
     }
 
