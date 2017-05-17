@@ -198,12 +198,16 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         }
         return result;
     }
-    void sendIscpCommand(String message){
-        try{
-            conn.sendIscpCommand(message);
-        }   
-        catch (Exception e) {
-            YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when sending command: %s", e.getMessage());
+
+    void sendIscpCommand(String message) {
+        if (conn != null) {
+            try {
+                conn.sendIscpCommand(message);
+            } catch (Exception e) {
+                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when sending command: %s", e.getMessage());
+            }
+        } else {
+            new connectToReceiver().execute(message);
         }
     }
 
@@ -250,6 +254,13 @@ public class OnkyoPluginService extends AVReceiverPluginService {
                     conn.addListener(eiscpListener);
                 } catch (Exception ex) {
                     YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when adding listener: %s", ex.getMessage());
+                }
+            }
+            if (conn != null && message != null && message.length > 0 && !TextUtils.isEmpty(message[0])) {
+                try {
+                    conn.sendIscpCommand(message[0]);
+                } catch (Exception e) {
+                    YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when sending command: %s", e.getMessage());
                 }
             }
             return null;
