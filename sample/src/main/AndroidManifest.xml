@@ -45,7 +45,7 @@
         android:icon must point to a drawable. Mipmaps are not supported !
         -->
         <service
-            android:name=".AVPluginService"
+            android:name=".OnkyoPluginService"
             android:exported="true"
             android:icon="@drawable/ic_plugin_icon"
             android:label="@string/sample_plugin_name"

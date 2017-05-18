@@ -17,13 +17,30 @@
 apply plugin: 'com.android.application'
 
 android {
+
+    File signingProperties = file('release.properties')
+
+    signingConfigs {
+        //noinspection GroovyMissingReturnStatement
+        release {
+            if (signingProperties.exists()) {
+                def Properties keyProps = new Properties()
+                keyProps.load(new FileInputStream(signingProperties))
+                storeFile file(keyProps["keystore"])
+                keyAlias keyProps["alias"]
+                storePassword keyProps["keystore.password"]
+                keyPassword keyProps["alias.password"]
+            }
+        }
+    }
+
     compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
         applicationId "com.danielhstahl.plugin.avreceiver.onkyo"
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
     }
@@ -31,14 +48,20 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlignEnabled true
+            if (signingProperties.exists()) {
+                //noinspection GrUnresolvedAccess
+                //noinspection GroovyAssignabilityCheck
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
 
 dependencies {
-    compile 'com.android.support:design:25.0.1'
-    compile 'com.android.support:support-annotations:25.0.1'
-    compile 'com.jakewharton:butterknife:8.4.0'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:support-annotations:25.3.1'
+    compile 'com.jakewharton:butterknife:8.5.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     compile project(':api')
 }
