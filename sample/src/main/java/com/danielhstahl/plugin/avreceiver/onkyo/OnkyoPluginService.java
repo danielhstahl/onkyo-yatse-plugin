@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Arrays;
 
 import tv.yatse.plugin.avreceiver.api.AVReceiverPluginService;
 import tv.yatse.plugin.avreceiver.api.PluginCustomCommand;
@@ -198,17 +197,18 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         }
         return result;
     }
+
     /* Moved back to "stateless" to fix issue some receivers are having */
     private class sendIscpCommand extends AsyncTask<String, String, Void> {
         @Override
         protected Void doInBackground(String... message) {
-            EiscpConnector conn;
+            EiscpConnector eiscpConnector;
             try {
-                conn=new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
-                conn.sendIscpCommand(message[0]);
-                conn.close();
+                eiscpConnector = new EiscpConnector(mReceiverIP, Integer.parseInt(mReceiverPort));
+                eiscpConnector.sendIscpCommand(message[0]);
+                eiscpConnector.close();
             } catch (Exception e) {
-                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when sending command: %s", e);
+                YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when sending command", e);
             }
             return null;
         }
