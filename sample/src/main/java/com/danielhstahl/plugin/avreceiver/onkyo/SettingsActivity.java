@@ -71,7 +71,6 @@ public class SettingsActivity extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //System.out.println("This makes no sense");
         setContentView(R.layout.activity_settings);
         ButterKnife.bind(this);
         if (getIntent() != null) {
@@ -145,9 +144,7 @@ public class SettingsActivity extends AppCompatActivity  {
                 EiscpConnector conn = new EiscpConnector(threadedIP, Integer.parseInt(threadedPort));
                 conn.sendIscpCommand(message[0]);
                 conn.close();
-                System.out.println("task tested");
             }catch(Exception e){
-                System.out.println(e);
                 YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when connecting: %s", e);
             }
             return null;
@@ -161,7 +158,6 @@ public class SettingsActivity extends AppCompatActivity  {
             try {
                 EiscpConnector conn = EiscpConnector.autodiscover();
                 address=conn.getAddress();
-                System.out.println("address gotten");
                 conn.close();
             }catch(Exception e){
                 YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error when scanning: %s", e);
