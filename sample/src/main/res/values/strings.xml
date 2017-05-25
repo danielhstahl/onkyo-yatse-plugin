@@ -15,6 +15,8 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <item name="visible" type="id"/>
+    <item name="masked" type="id"/>
     <string name="app_name">Yatse Onkyo receiver plugin</string>
     <string name="sample_plugin_name">Onkyo receiver plugin</string>
     <string name="sample_plugin_description">Onkyo plugin</string>
@@ -36,6 +38,7 @@
     <string name="sample_plugin_custom_command_description">Add specific commands that your Onkyo receiver supports.  </string>
     <string name="url_to_commands"><a href='http://michael.elsdoerfer.name/onkyo/'>Get codes here.</a></string>
     <string name="sample_plugin_custom_command_title">Name</string>
+    <string name="toggle_receiver">Two Way Communication</string>
     <string name="sample_plugin_custom_command_param1">Parameter 1</string>
 
     <string name="save">Save</string>

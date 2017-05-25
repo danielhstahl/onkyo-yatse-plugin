@@ -103,6 +103,13 @@
                     android:textColor="@color/white"/>
 
             </android.support.design.widget.TextInputLayout>
+
+            <CheckBox android:id="@+id/checkbox_toggle_receiver_output"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/toggle_receiver"
+                />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

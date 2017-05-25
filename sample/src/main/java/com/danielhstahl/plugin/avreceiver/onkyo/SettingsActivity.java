@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.CheckBox;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,18 +52,20 @@ import com.danielhstahl.plugin.avreceiver.onkyo.helpers.PreferencesHelper;
 public class SettingsActivity extends AppCompatActivity  {
 
     private static final String TAG = "SettingsActivity";
-   // private EiscpConnector conn;
     private String mMediaCenterUniqueId;
     private String mMediaCenterName;
     private boolean mMuted;
     private String threadedIP;
     private String threadedPort;
+    private boolean isTwoWay;
     @BindView(R.id.receiver_settings_title)
     TextView mViewSettingsTitle;
     @BindView(R.id.receiver_port_description)
     TextView mPortDescription;
     @BindView(R.id.receiver_ip)
     EditText mViewReceiverIP;
+    @BindView(R.id.checkbox_toggle_receiver_output)
+    CheckBox mToggleReceiver;
     @BindView(R.id.receiver_port)
     EditText mViewReceiverPort;
     @BindView(R.id.btn_toggle_mute)
@@ -76,6 +79,7 @@ public class SettingsActivity extends AppCompatActivity  {
         if (getIntent() != null) {
             mMediaCenterUniqueId = getIntent().getStringExtra(AVReceiverPluginService.EXTRA_STRING_MEDIA_CENTER_UNIQUE_ID);
             mMediaCenterName = getIntent().getStringExtra(AVReceiverPluginService.EXTRA_STRING_MEDIA_CENTER_NAME);
+
         }
         if (TextUtils.isEmpty(mMediaCenterUniqueId)) {
             YatseLogger.getInstance(getApplicationContext()).logError(TAG, "Error : No media center unique id sent");
@@ -89,9 +93,10 @@ public class SettingsActivity extends AppCompatActivity  {
             myPort=Integer.toString(EiscpConnector.DEFAULT_EISCP_PORT);
         }
         mViewReceiverPort.setText(myPort);
+        mToggleReceiver.setChecked(PreferencesHelper.getInstance(getApplicationContext()).receiverCommunication(mMediaCenterUniqueId));
     }
 
-    @OnClick({R.id.receiver_scan, R.id.btn_ok, R.id.btn_cancel, R.id.btn_vol_down, R.id.btn_toggle_mute, R.id.btn_vol_up})
+    @OnClick({R.id.receiver_scan, R.id.btn_ok, R.id.btn_cancel, R.id.btn_vol_down, R.id.btn_toggle_mute, R.id.btn_vol_up, R.id.checkbox_toggle_receiver_output})
     public void onClick(View v) {
         Intent resultIntent;
         threadedIP=mViewReceiverIP.getText().toString();
@@ -111,6 +116,9 @@ public class SettingsActivity extends AppCompatActivity  {
                 mMuted = !mMuted;
                 Snackbar.make(findViewById(R.id.receiver_settings_content), "Toggling mute", Snackbar.LENGTH_LONG).show();
                 break;
+            case R.id.checkbox_toggle_receiver_output:
+                isTwoWay = mToggleReceiver.isChecked();
+                break;
             case R.id.btn_vol_down:
                 new testTask().execute(EiscpConnector.MASTER_VOL_DOWN);
                 Snackbar.make(findViewById(R.id.receiver_settings_content), "Volume down", Snackbar.LENGTH_LONG).show();
@@ -122,6 +130,7 @@ public class SettingsActivity extends AppCompatActivity  {
             case R.id.btn_ok:
                 PreferencesHelper.getInstance(getApplicationContext()).hostIp(mMediaCenterUniqueId, threadedIP);
                 PreferencesHelper.getInstance(getApplicationContext()).hostPort(mMediaCenterUniqueId, threadedPort);
+                PreferencesHelper.getInstance(getApplicationContext()).receiverCommunication(mMediaCenterUniqueId, isTwoWay);
                 resultIntent = new Intent();
                 resultIntent.putExtra(AVReceiverPluginService.EXTRA_STRING_MEDIA_CENTER_UNIQUE_ID, mMediaCenterUniqueId);
                 setResult(RESULT_OK, resultIntent);
