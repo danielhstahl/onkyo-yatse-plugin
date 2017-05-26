@@ -105,7 +105,7 @@ public class PreferencesHelper {
         return mPreferences.getString("host_port_" + hostUniqueId, "");
     }
     public boolean receiverCommunication(String hostUniqueId) {
-        return mPreferences.getBoolean("host_port_" + hostUniqueId, true);
+        return mPreferences.getBoolean("two_way_" + hostUniqueId, true);
     }
 
     public void hostIp(String hostUniqueId, String ip) {
@@ -131,7 +131,7 @@ public class PreferencesHelper {
             settingsVersion(settingsVersion() + 1);
         }
         SharedPreferences.Editor mEditor = mPreferences.edit();
-        mEditor.putBoolean("host_port_" + hostUniqueId, isTwoWay);
+        mEditor.putBoolean("two_way_" + hostUniqueId, isTwoWay);
         mEditor.apply();
     }
 
