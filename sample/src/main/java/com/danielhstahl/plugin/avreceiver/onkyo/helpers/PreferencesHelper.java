@@ -101,9 +101,11 @@ public class PreferencesHelper {
     public String hostIp(String hostUniqueId) {
         return mPreferences.getString("host_ip_" + hostUniqueId, "");
     }
+
     public String hostPort(String hostUniqueId) {
         return mPreferences.getString("host_port_" + hostUniqueId, "");
     }
+
     public boolean receiverCommunication(String hostUniqueId) {
         return mPreferences.getBoolean("two_way_" + hostUniqueId, true);
     }
@@ -127,7 +129,7 @@ public class PreferencesHelper {
     }
 
     public void receiverCommunication(String hostUniqueId, boolean isTwoWay) {
-        if (receiverCommunication(hostUniqueId)!=isTwoWay) {
+        if (receiverCommunication(hostUniqueId) != isTwoWay) {
             settingsVersion(settingsVersion() + 1);
         }
         SharedPreferences.Editor mEditor = mPreferences.edit();

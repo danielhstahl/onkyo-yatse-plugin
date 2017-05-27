@@ -49,7 +49,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     private String mReceiverPort;
     private String mReceiverIP;
     private boolean mIsMuted = false;
-    private boolean isTwoWay=true;
+    private boolean isTwoWay = true;
     private double mVolumePercent = 50;
     private static final double max_volume = 100;
     private static final double numberOfPercentsInOne = 100.0;
@@ -176,8 +176,8 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         mHostIp = ip;
         mReceiverIP = PreferencesHelper.getInstance(getApplicationContext()).hostIp(mHostUniqueId);
         mReceiverPort = PreferencesHelper.getInstance(getApplicationContext()).hostPort(mHostUniqueId);
-        isTwoWay=PreferencesHelper.getInstance(getApplicationContext()).receiverCommunication(mHostUniqueId);
-        if(isTwoWay) {
+        isTwoWay = PreferencesHelper.getInstance(getApplicationContext()).receiverCommunication(mHostUniqueId);
+        if (isTwoWay) {
             new connectToReceiver().execute();
         }
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Connected to: %s / %s ", name, mHostUniqueId);

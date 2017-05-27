@@ -16,12 +16,13 @@
 
 package com.danielhstahl.plugin.avreceiver.onkyo;
 
-import android.os.Bundle;
+import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+
 import butterknife.BindView;
-import android.content.Intent;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import tv.yatse.plugin.avreceiver.api.AVReceiverCustomCommandsAppCompatActivity;
@@ -68,6 +69,7 @@ public class CustomCommandsActivity extends AVReceiverCustomCommandsAppCompatAct
                 break;
         }
     }
+
     public void openWebPage(String url) {
         Uri webpage = Uri.parse(url);
         Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
