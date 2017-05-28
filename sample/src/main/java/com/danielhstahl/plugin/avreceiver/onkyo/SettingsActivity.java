@@ -93,7 +93,8 @@ public class SettingsActivity extends AppCompatActivity  {
             myPort=Integer.toString(EiscpConnector.DEFAULT_EISCP_PORT);
         }
         mViewReceiverPort.setText(myPort);
-        mToggleReceiver.setChecked(PreferencesHelper.getInstance(getApplicationContext()).receiverCommunication(mMediaCenterUniqueId));
+        isTwoWay=PreferencesHelper.getInstance(getApplicationContext()).receiverCommunication(mMediaCenterUniqueId);
+        mToggleReceiver.setChecked(isTwoWay);
     }
 
     @OnClick({R.id.receiver_scan, R.id.btn_ok, R.id.btn_cancel, R.id.btn_vol_down, R.id.btn_toggle_mute, R.id.btn_vol_up, R.id.checkbox_toggle_receiver_output})
