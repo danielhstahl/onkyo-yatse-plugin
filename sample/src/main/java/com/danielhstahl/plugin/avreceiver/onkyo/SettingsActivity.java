@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -40,7 +41,6 @@ import com.danielhstahl.plugin.avreceiver.onkyo.helpers.PreferencesHelper;
 
 
 
-
 /**
  * Sample SettingsActivity that handle correctly the parameters passed by Yatse.
  * <p/>
@@ -49,7 +49,7 @@ import com.danielhstahl.plugin.avreceiver.onkyo.helpers.PreferencesHelper;
  * <p/>
  * <b>Production plugin should make input validation and tests before accepting the user input and returning RESULT_OK.</b>
  */
-public class SettingsActivity extends AppCompatActivity  {
+public class SettingsActivity extends AppCompatActivity {
 
     private static final String TAG = "SettingsActivity";
     private String mMediaCenterUniqueId;
@@ -66,6 +66,7 @@ public class SettingsActivity extends AppCompatActivity  {
     EditText mViewReceiverIP;
     @BindView(R.id.checkbox_toggle_receiver_output)
     CheckBox mToggleReceiver;
+
     @BindView(R.id.receiver_port)
     EditText mViewReceiverPort;
     @BindView(R.id.btn_toggle_mute)
@@ -97,6 +98,9 @@ public class SettingsActivity extends AppCompatActivity  {
         mToggleReceiver.setChecked(isTwoWay);
     }
 
+
+
+
     @OnClick({R.id.receiver_scan, R.id.btn_ok, R.id.btn_cancel, R.id.btn_vol_down, R.id.btn_toggle_mute, R.id.btn_vol_up, R.id.checkbox_toggle_receiver_output})
     public void onClick(View v) {
         Intent resultIntent;
@@ -120,6 +124,7 @@ public class SettingsActivity extends AppCompatActivity  {
             case R.id.checkbox_toggle_receiver_output:
                 isTwoWay = mToggleReceiver.isChecked();
                 break;
+
             case R.id.btn_vol_down:
                 new testTask().execute(EiscpConnector.MASTER_VOL_DOWN);
                 Snackbar.make(findViewById(R.id.receiver_settings_content), "Volume down", Snackbar.LENGTH_LONG).show();
@@ -147,6 +152,7 @@ public class SettingsActivity extends AppCompatActivity  {
                 break;
         }
     }
+
     public class testTask extends AsyncTask<String, String, EiscpConnector> {
         @Override
         protected EiscpConnector doInBackground(String... message){

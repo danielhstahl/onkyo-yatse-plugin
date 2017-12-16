@@ -102,6 +102,7 @@ public class PreferencesHelper {
         return mPreferences.getString("host_ip_" + hostUniqueId, "");
     }
 
+
     public String hostPort(String hostUniqueId) {
         return mPreferences.getString("host_port_" + hostUniqueId, "");
     }
@@ -136,6 +137,7 @@ public class PreferencesHelper {
         mEditor.putBoolean("two_way_" + hostUniqueId, isTwoWay);
         mEditor.apply();
     }
+
 
     public long settingsVersion() {
         return mPreferences.getLong("settings_version", 0);

@@ -16,7 +16,10 @@
 
 package com.danielhstahl.plugin.avreceiver.onkyo;
 
+import android.database.ContentObserver;
+import android.media.AudioManager;
 import android.os.AsyncTask;
+import android.support.v4.media.VolumeProviderCompat;
 import android.text.TextUtils;
 
 import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpConnector;
@@ -38,6 +41,11 @@ import tv.yatse.plugin.avreceiver.api.YatseLogger;
  * <p/>
  * See {@link AVReceiverPluginService} for documentation on all functions
  */
+
+
+
+
+
 public class OnkyoPluginService extends AVReceiverPluginService {
 
     private static final String TAG = "OnkyoPluginService";
@@ -66,6 +74,12 @@ public class OnkyoPluginService extends AVReceiverPluginService {
             conn = null;
         }
     }
+
+
+
+
+
+
 
     @Override
     protected int getVolumeUnitType() {
@@ -108,7 +122,9 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     @Override
     protected boolean setVolumeLevel(double volume) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting volume level: %s", volume);
-        new sendIscpCommand().execute(EiscpConnector.MASTER_VOL + String.format("0x%08X", (int) (volume))); //hexadecimal
+        String volumeStr=String.format("%02X", (int) (volume));
+        YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting volume level string: %s", volumeStr);
+        new sendIscpCommand().execute(EiscpConnector.MASTER_VOL + volumeStr); //hexadecimal
         mVolumePercent = volume * numberOfPercentsInOne / max_volume;
         return true;
     }
@@ -276,5 +292,8 @@ public class OnkyoPluginService extends AVReceiverPluginService {
             return null;
         }
     }
+
+
+
 
 }
