@@ -22,24 +22,18 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.CheckBox;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import tv.yatse.plugin.avreceiver.api.AVReceiverPluginService;
 import tv.yatse.plugin.avreceiver.api.YatseLogger;
 import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpConnector;
-
 import com.danielhstahl.plugin.avreceiver.onkyo.helpers.PreferencesHelper;
-
-
-
 
 /**
  * Sample SettingsActivity that handle correctly the parameters passed by Yatse.

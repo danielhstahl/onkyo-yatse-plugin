@@ -15,11 +15,7 @@
  */
 
 package com.danielhstahl.plugin.avreceiver.onkyo;
-
-import android.database.ContentObserver;
-import android.media.AudioManager;
 import android.os.AsyncTask;
-import android.support.v4.media.VolumeProviderCompat;
 import android.text.TextUtils;
 
 import com.danielhstahl.plugin.avreceiver.onkyo.helpers.EiscpConnector;
