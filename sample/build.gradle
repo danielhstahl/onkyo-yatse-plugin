@@ -41,8 +41,8 @@ android {
         applicationId "com.danielhstahl.plugin.avreceiver.onkyo"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 16
-        versionName "1.0.3"
+        versionCode 18
+        versionName "1.0.4"
     }
     buildTypes {
         release {
