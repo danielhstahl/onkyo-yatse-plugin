@@ -134,10 +134,11 @@ public class PreferencesHelper {
     public void setReceiverCommunication(String hostUniqueId, boolean isTwoWay) {
         if (getReceiverCommunication(hostUniqueId) != isTwoWay) {
             setSettingsVersion(getSettingsVersion() + 1);
+            SharedPreferences.Editor mEditor = mPreferences.edit();
+            mEditor.putBoolean("two_way_" + hostUniqueId, isTwoWay);
+            mEditor.apply();
         }
-        SharedPreferences.Editor mEditor = mPreferences.edit();
-        mEditor.putBoolean("two_way_" + hostUniqueId, isTwoWay);
-        mEditor.apply();
+
     }
 
 
