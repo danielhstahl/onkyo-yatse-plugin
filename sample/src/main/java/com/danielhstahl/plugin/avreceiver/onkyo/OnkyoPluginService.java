@@ -55,8 +55,37 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     private boolean mIsMuted = false;
     private boolean isTwoWay = true;
     private double mVolumePercent = 50;
-    private static final double max_volume = 100;
-    private static final double numberOfPercentsInOne = 100.0;
+    private static final double maxVolume = 100;
+    private static final double numberOfPercentsInOne = 100;
+    private static final double volumeScale = numberOfPercentsInOne/maxVolume;
+
+
+
+    static double setVolume(double volume, double scale){
+        return volume*scale;
+    }
+    static double incrementVolume(double volume, double increment){
+        return volume+increment;
+    }
+
+    static String getVolumeAsHex(double volume){
+        return String.format("%02X", (int) (volume));
+    }
+    static double getHexAsVolume(String hexVolume, double scale){
+        return (double) (Integer.parseInt(hexVolume, 16)) * scale;
+    }
+
+
+    static String createReceiverCommand(String command, String parameter){
+        return command+parameter;
+    }
+    static String parseReceiverCommand(String message){
+        return message.substring(0, 3);
+    }
+    static String parseReceiverParameter(String message){
+        return message.substring(3);
+    }
+
 
     @Override
     public void onCreate() {
@@ -71,12 +100,6 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         }
     }
 
-
-
-
-
-
-
     @Override
     protected int getVolumeUnitType() {
         return UNIT_TYPE_PERCENT;
@@ -89,7 +112,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
     @Override
     protected double getVolumeMaximalValue() {
-        return max_volume;
+        return maxVolume;
     }
 
     @Override
@@ -118,10 +141,10 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     @Override
     protected boolean setVolumeLevel(double volume) {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting volume level: %s", volume);
-        String volumeStr=String.format("%02X", (int) (volume));
+        String volumeStr=getVolumeAsHex(volume);
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Setting volume level string: %s", volumeStr);
-        new sendIscpCommand().execute(EiscpConnector.MASTER_VOL + volumeStr); //hexadecimal
-        mVolumePercent = volume * numberOfPercentsInOne / max_volume;
+        new sendIscpCommand().execute(createReceiverCommand(EiscpConnector.MASTER_VOL, volumeStr)); //hexadecimal
+        mVolumePercent = setVolume(volume, volumeScale);//volume * numberOfPercentsInOne / maxVolume;
         return true;
     }
 
@@ -133,7 +156,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     @Override
     protected boolean volumePlus() {
         new sendIscpCommand().execute(EiscpConnector.MASTER_VOL_UP);
-        mVolumePercent = Math.min(max_volume, mVolumePercent + numberOfPercentsInOne / max_volume);
+        mVolumePercent = Math.min(maxVolume, incrementVolume(mVolumePercent, volumeScale));
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Calling volume plus");
         return true;
     }
@@ -141,7 +164,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     @Override
     protected boolean volumeMinus() {
         new sendIscpCommand().execute(EiscpConnector.MASTER_VOL_DOWN);
-        mVolumePercent = Math.max(0.0, mVolumePercent - numberOfPercentsInOne / max_volume);
+        mVolumePercent = Math.max(0.0, incrementVolume(mVolumePercent, -volumeScale));
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Calling volume minus");
         return true;
     }
@@ -149,12 +172,12 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     @Override
     protected boolean refresh() {
         YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Refreshing values from receiver");
-        if (lastReceivedValues.get(EiscpConnector.MASTER_VOL) != null) {
-            mVolumePercent = (double) (Integer.parseInt(lastReceivedValues.get(EiscpConnector.MASTER_VOL), 16)) * numberOfPercentsInOne / max_volume;
+        String masterVol=lastReceivedValues.get(EiscpConnector.MASTER_VOL);
+        String mute=lastReceivedValues.get(EiscpConnector.MUTE);
+        if (masterVol != null) {
+            mVolumePercent = getHexAsVolume(masterVol,  volumeScale);
         }
-        if (lastReceivedValues.get(EiscpConnector.MUTE) != null) {
-            mIsMuted = lastReceivedValues.get(EiscpConnector.MUTE).equals("01");
-        }
+        if (mute != null) mIsMuted = mute.equals("01");
         if (conn == null && isTwoWay) {
             // Was disconnected from receiver, try to reconnect
             new connectToReceiver().execute();
@@ -186,9 +209,9 @@ public class OnkyoPluginService extends AVReceiverPluginService {
         mHostUniqueId = uniqueId;
         mHostName = name;
         mHostIp = ip;
-        mReceiverIP = PreferencesHelper.getInstance(getApplicationContext()).hostIp(mHostUniqueId);
-        mReceiverPort = PreferencesHelper.getInstance(getApplicationContext()).hostPort(mHostUniqueId);
-        isTwoWay = PreferencesHelper.getInstance(getApplicationContext()).receiverCommunication(mHostUniqueId);
+        mReceiverIP = PreferencesHelper.getInstance(getApplicationContext()).getHostIp(mHostUniqueId);
+        mReceiverPort = PreferencesHelper.getInstance(getApplicationContext()).getHostPort(mHostUniqueId);
+        isTwoWay = PreferencesHelper.getInstance(getApplicationContext()).getReceiverCommunication(mHostUniqueId);
         if (isTwoWay) {
             new connectToReceiver().execute();
         }
@@ -197,7 +220,7 @@ public class OnkyoPluginService extends AVReceiverPluginService {
 
     @Override
     protected long getSettingsVersion() {
-        return PreferencesHelper.getInstance(getApplicationContext()).settingsVersion();
+        return PreferencesHelper.getInstance(getApplicationContext()).getSettingsVersion();
     }
 
     @Override
@@ -233,8 +256,8 @@ public class OnkyoPluginService extends AVReceiverPluginService {
     private EiscpListener eiscpListener = new EiscpListener() {
         @Override
         public void receivedIscpMessage(String message) {
-            String command = message.substring(0, 3);
-            String parameter = message.substring(3);
+            String command = parseReceiverCommand(message);
+            String parameter = parseReceiverParameter(message);
             YatseLogger.getInstance(getApplicationContext()).logVerbose(TAG, "Receiving message");
             lastReceivedValues.put(command, parameter);
         }

@@ -90,7 +90,7 @@ public class PreferencesHelper {
                 }
             }
             mEditor.apply();
-            settingsVersion(version);
+            setSettingsVersion(version);
         } catch (JSONException e) {
             YatseLogger.getInstance(mContext).logError(TAG, "Error decoding settings", e);
         }
@@ -98,40 +98,42 @@ public class PreferencesHelper {
     }
 
 
-    public String hostIp(String hostUniqueId) {
+    public String getHostIp(String hostUniqueId) {
         return mPreferences.getString("host_ip_" + hostUniqueId, "");
     }
 
 
-    public String hostPort(String hostUniqueId) {
+    public String getHostPort(String hostUniqueId) {
         return mPreferences.getString("host_port_" + hostUniqueId, "");
     }
 
-    public boolean receiverCommunication(String hostUniqueId) {
+    public boolean getReceiverCommunication(String hostUniqueId) {
         return mPreferences.getBoolean("two_way_" + hostUniqueId, true);
     }
 
-    public void hostIp(String hostUniqueId, String ip) {
-        if (!TextUtils.equals(hostIp(hostUniqueId), ip)) {
-            settingsVersion(settingsVersion() + 1);
+    public void setHostIp(String hostUniqueId, String ip) {
+        if (!TextUtils.equals(getHostIp(hostUniqueId), ip)) {
+            setSettingsVersion(getSettingsVersion() + 1);
+            SharedPreferences.Editor mEditor = mPreferences.edit();
+            mEditor.putString("host_ip_" + hostUniqueId, ip);
+            mEditor.apply();
         }
-        SharedPreferences.Editor mEditor = mPreferences.edit();
-        mEditor.putString("host_ip_" + hostUniqueId, ip);
-        mEditor.apply();
+
     }
 
-    public void hostPort(String hostUniqueId, String port) {
-        if (!TextUtils.equals(hostPort(hostUniqueId), port)) {
-            settingsVersion(settingsVersion() + 1);
+    public void setHostPort(String hostUniqueId, String port) {
+        if (!TextUtils.equals(getHostPort(hostUniqueId), port)) {
+            setSettingsVersion(getSettingsVersion() + 1);
+            SharedPreferences.Editor mEditor = mPreferences.edit();
+            mEditor.putString("host_port_" + hostUniqueId, port);
+            mEditor.apply();
         }
-        SharedPreferences.Editor mEditor = mPreferences.edit();
-        mEditor.putString("host_port_" + hostUniqueId, port);
-        mEditor.apply();
+
     }
 
-    public void receiverCommunication(String hostUniqueId, boolean isTwoWay) {
-        if (receiverCommunication(hostUniqueId) != isTwoWay) {
-            settingsVersion(settingsVersion() + 1);
+    public void setReceiverCommunication(String hostUniqueId, boolean isTwoWay) {
+        if (getReceiverCommunication(hostUniqueId) != isTwoWay) {
+            setSettingsVersion(getSettingsVersion() + 1);
         }
         SharedPreferences.Editor mEditor = mPreferences.edit();
         mEditor.putBoolean("two_way_" + hostUniqueId, isTwoWay);
@@ -139,11 +141,11 @@ public class PreferencesHelper {
     }
 
 
-    public long settingsVersion() {
+    public long getSettingsVersion() {
         return mPreferences.getLong("settings_version", 0);
     }
 
-    public void settingsVersion(long settingsVersion) {
+    public void setSettingsVersion(long settingsVersion) {
         SharedPreferences.Editor mEditor = mPreferences.edit();
         mEditor.putLong("settings_version", settingsVersion);
         mEditor.apply();

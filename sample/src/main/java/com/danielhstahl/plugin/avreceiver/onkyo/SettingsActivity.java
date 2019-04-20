@@ -82,13 +82,13 @@ public class SettingsActivity extends AppCompatActivity {
         }
         mViewSettingsTitle.setText(getString(R.string.sample_plugin_settings) + " " + mMediaCenterName);
         mPortDescription.setText(getString(R.string.sample_plugin_receiver_port_description)+" ("+EiscpConnector.DEFAULT_EISCP_PORT+")");
-        mViewReceiverIP.setText(PreferencesHelper.getInstance(getApplicationContext()).hostIp(mMediaCenterUniqueId));
-        String myPort=PreferencesHelper.getInstance(getApplicationContext()).hostPort(mMediaCenterUniqueId);
+        mViewReceiverIP.setText(PreferencesHelper.getInstance(getApplicationContext()).getHostIp(mMediaCenterUniqueId));
+        String myPort=PreferencesHelper.getInstance(getApplicationContext()).getHostPort(mMediaCenterUniqueId);
         if(myPort.length()>5|myPort.length()==0){
             myPort=Integer.toString(EiscpConnector.DEFAULT_EISCP_PORT);
         }
         mViewReceiverPort.setText(myPort);
-        isTwoWay=PreferencesHelper.getInstance(getApplicationContext()).receiverCommunication(mMediaCenterUniqueId);
+        isTwoWay=PreferencesHelper.getInstance(getApplicationContext()).getReceiverCommunication(mMediaCenterUniqueId);
         mToggleReceiver.setChecked(isTwoWay);
     }
 
@@ -128,9 +128,9 @@ public class SettingsActivity extends AppCompatActivity {
                 Snackbar.make(findViewById(R.id.receiver_settings_content), "Volume up", Snackbar.LENGTH_LONG).show();
                 break;
             case R.id.btn_ok:
-                PreferencesHelper.getInstance(getApplicationContext()).hostIp(mMediaCenterUniqueId, threadedIP);
-                PreferencesHelper.getInstance(getApplicationContext()).hostPort(mMediaCenterUniqueId, threadedPort);
-                PreferencesHelper.getInstance(getApplicationContext()).receiverCommunication(mMediaCenterUniqueId, isTwoWay);
+                PreferencesHelper.getInstance(getApplicationContext()).setHostIp(mMediaCenterUniqueId, threadedIP);
+                PreferencesHelper.getInstance(getApplicationContext()).setHostPort(mMediaCenterUniqueId, threadedPort);
+                PreferencesHelper.getInstance(getApplicationContext()).setReceiverCommunication(mMediaCenterUniqueId, isTwoWay);
                 resultIntent = new Intent();
                 resultIntent.putExtra(AVReceiverPluginService.EXTRA_STRING_MEDIA_CENTER_UNIQUE_ID, mMediaCenterUniqueId);
                 setResult(RESULT_OK, resultIntent);
