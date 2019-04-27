@@ -26,7 +26,7 @@ script: ./gradlew assembleDebug
 deploy:
   provider: releases
   api_key: $github_token
-  file: ./onkyo/build/outputs/apk/onkyo-debug.apk
+  file: ./onkyo/build/outputs/apk/debug/onkyo-debug.apk
   skip_cleanup: true
   on:
     tags: true
