@@ -14,4 +14,4 @@
  *
  */
 
-include ':sample', ':api'
+include ':onkyo', ':api'
