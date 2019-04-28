@@ -97,18 +97,20 @@ public class PreferencesHelper {
         return true;
     }
 
-
+    private static String ip_key="host_ip_";
+    private static String port_key="host_port_";
+    private static String two_way_key="two_way_str_";
     public String getHostIp(String hostUniqueId) {
-        return mPreferences.getString("host_ip_" + hostUniqueId, "");
+        return mPreferences.getString(ip_key + hostUniqueId, "");
     }
 
 
     public String getHostPort(String hostUniqueId) {
-        return mPreferences.getString("host_port_" + hostUniqueId, "");
+        return mPreferences.getString(port_key + hostUniqueId, "");
     }
 
     public boolean getReceiverCommunication(String hostUniqueId) {
-        String two_way= mPreferences.getString("two_way_" + hostUniqueId, "true");
+        String two_way= mPreferences.getString(two_way_key + hostUniqueId, "true");
         return two_way=="true";
     }
 
@@ -116,7 +118,7 @@ public class PreferencesHelper {
         if (!TextUtils.equals(getHostIp(hostUniqueId), ip)) {
             setSettingsVersion(getSettingsVersion() + 1);
             SharedPreferences.Editor mEditor = mPreferences.edit();
-            mEditor.putString("host_ip_" + hostUniqueId, ip);
+            mEditor.putString(ip_key + hostUniqueId, ip);
             mEditor.apply();
         }
 
@@ -126,7 +128,7 @@ public class PreferencesHelper {
         if (!TextUtils.equals(getHostPort(hostUniqueId), port)) {
             setSettingsVersion(getSettingsVersion() + 1);
             SharedPreferences.Editor mEditor = mPreferences.edit();
-            mEditor.putString("host_port_" + hostUniqueId, port);
+            mEditor.putString(port_key + hostUniqueId, port);
             mEditor.apply();
         }
 
@@ -137,7 +139,7 @@ public class PreferencesHelper {
             setSettingsVersion(getSettingsVersion() + 1);
             SharedPreferences.Editor mEditor = mPreferences.edit();
             String two_way=isTwoWay ? "true":"false";
-            mEditor.putString("two_way_" + hostUniqueId, two_way);
+            mEditor.putString(two_way_key + hostUniqueId, two_way);
             mEditor.apply();
         }
 
