@@ -35,14 +35,12 @@ android {
     }
 
     compileSdkVersion 28
-    //buildToolsVersion "26.0.2"
-
     defaultConfig {
         applicationId "com.danielhstahl.plugin.avreceiver.onkyo"
         minSdkVersion 14
         targetSdkVersion 28
-        versionCode 18
-        versionName "1.0.4"
+        versionCode 19
+        versionName "1.0.5"
     }
     buildTypes {
         release {
@@ -50,8 +48,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             zipAlignEnabled true
             if (signingProperties.exists()) {
-                //noinspection GrUnresolvedAccess
-                //noinspection GroovyAssignabilityCheck
                 signingConfig signingConfigs.release
             }
         }
